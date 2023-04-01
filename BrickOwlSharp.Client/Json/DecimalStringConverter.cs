@@ -31,52 +31,29 @@ using BrickOwlSharp;
 
 namespace BrickOwlSharp.Client.Json
 {
-    internal abstract class ExtJsonConverter<T> : JsonConverter<T>
+    internal class DecimalStringConverter : JsonConverter<decimal?>
     {
-        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var stringValue = reader.GetString();
-            return Read(stringValue);
-        }
-
-        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-        {
-            string s = Write(value);
-            writer.WriteStringValue(s);
-        }
-
-
-        public abstract T Read(string value);
-        public abstract string Write(T value);
-    }
-
-
-
-    internal class ConditionStringConverter : ExtJsonConverter<Condition>
-    {
-        public override Condition Read(string value)
-        {
-            switch (value)
+            if (decimal.TryParse(stringValue, out decimal value))
             {
-                case "new": return Condition.New;
-                case "news": return Condition.NewSealed;
-                case "newc": return Condition.NewComplete;
-                case "newi": return Condition.NewIncomplete;
-                case "usedc": return Condition.UsedComplete;
-                case "usedi": return Condition.UsedIncomplete;
-                case "usedn": return Condition.UsedLikeNew;
-                case "usedg": return Condition.UsedGood;
-                case "useda": return Condition.UsedAcceptable;
-                case "other": return Condition.Other;
-                default:
-                    return Condition.Other;
+                return value;
             }
+            return null;
         }
-        
 
-        public override string Write(Condition value)
+        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
         {
-            return value.ToDomainString();
+            if (value.HasValue)
+            {
+                var typeString = value.ToString();
+                writer.WriteStringValue(typeString);
+            }
+            else
+            {
+                writer.WriteStringValue(""); // ???
+            }            
         }
     }
 }

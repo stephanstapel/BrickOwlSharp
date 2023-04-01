@@ -1,9 +1,11 @@
 ﻿using BrickOwlSharp.Client.Extensions;
+using BrickOwlSharp.Client.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -77,32 +79,77 @@ namespace BrickOwlSharp.Client
         }
 
 
-        public async Task CreateInventoryAsync(
+        public async Task<NewInventoryResult> CreateInventoryAsync(
             NewInventory newInventory,
             CancellationToken cancellationToken = default)
         {
-            Dictionary<string, string> formData = new Dictionary<string, string>();
-            formData.Add("key", BrickOwlClientConfiguration.Instance.ApiKey);
-            formData.Add("boid", newInventory.Id.ToString());
-            formData.Add("quantity", newInventory.Quantity.ToString());
-            formData.Add("price", newInventory.Price.ToString(CultureInfo.InvariantCulture));
-            formData.Add("condition", EnumExtensions.ToDomainString(newInventory.Condition));
+            Dictionary<string, string> formData = _ObjectToFormData(newInventory);
 
             var url = new Uri(_baseUri, $"inventory/create").ToString();
             NewInventoryResult result = await ExeucutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
+            return result;
+        }        
+
+
+        public async Task<bool> UpdateInventoryAsync(
+            UpdateInventory updatedInventory,
+            CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = _ObjectToFormData(updatedInventory);
+
+            var url = new Uri(_baseUri, $"inventory/update").ToString();
+            BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+            return (result?.Status == "success");
         }
+
+
+        public async Task<List<Inventory>> GetInventoryAsync(
+            string filter = null, bool? activeOnly = null, string externalId = null, int? lotId = null,
+            CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"inventory/list").ToString();
+
+            url = AppendOptionalParam(url, "filter", filter);
+            url = AppendOptionalParam(url, "active_only", activeOnly);
+            url = AppendOptionalParam(url, "external_id_1", externalId);
+            url = AppendOptionalParam(url, "lot_id", lotId);
+
+            return await ExecuteGet<List<Inventory>>(url, cancellationToken);
+        } // !GetInventoryAsync()
+
+
+        public async Task<bool> DeleteInventoryAsync(
+           DeleteInventory deleteInventory,
+           CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = _ObjectToFormData(deleteInventory);
+
+            var url = new Uri(_baseUri, $"inventory/delete").ToString();
+            BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+            return (result?.Status == "success");
+        } // !GetInventoryAsync()
 
 
         private static string AppendApiKey(string url)
         {
             BrickOwlClientConfiguration.Instance.ValidateThrowException();
+            return AppendOptionalParam(url, "key", BrickOwlClientConfiguration.Instance.ApiKey);
+        } // !AppendApiKey()
+
+
+        private static string AppendOptionalParam(string url, string key, object value)
+        {
+            if (value == null)
+            {
+                return url;
+            }
 
             var uriBuilder = new UriBuilder(url);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            query["key"] = BrickOwlClientConfiguration.Instance.ApiKey;
+            query[key] = value.ToString();
             uriBuilder.Query = query.ToString();
             return uriBuilder.ToString();
-        }
+        } // !AppendOptionalParam()
 
 
         private async Task<TResponse> ExecuteGet<TResponse>(string url, CancellationToken cancellationToken = default)
@@ -135,8 +182,6 @@ namespace BrickOwlSharp.Client
             using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
                 HttpContent content = new FormUrlEncodedContent(formData);
-
-                message.Content = null;
                 var response = await _httpClient.PostAsync(url, content, cancellationToken);
                 response.EnsureSuccessStatusCode();
 
@@ -152,5 +197,64 @@ namespace BrickOwlSharp.Client
                 return responseData;
             }
         } // !ExeucutePost()
+
+
+        Dictionary<string, string> _ObjectToFormData(object o, bool addKey = true)
+        {
+            Dictionary<string, string> retval = new Dictionary<string, string>();
+
+            PropertyInfo[] props = o.GetType().GetProperties();
+            foreach (PropertyInfo prop in props)
+            {
+                object[] attrs = prop.GetCustomAttributes(true);
+
+                string name = null;
+                object rawValue = null;
+                string converterName = null;
+                string value = null;
+
+                foreach (object attr in attrs)
+                {
+                    if (attr.GetType() == typeof(JsonPropertyNameAttribute))
+                    {
+                        name = ((JsonPropertyNameAttribute)attr).Name;
+                        rawValue = o.GetType().GetProperty(prop.Name).GetValue(o);
+                    }
+                    else if (attr.GetType() == typeof(JsonConverterAttribute))
+                    {
+                        converterName = ((JsonConverterAttribute)attr).ConverterType.Name;
+                    }
+                }
+
+                if ((converterName == "ConditionStringConverter") && (rawValue != null))
+                {
+                    ConditionStringConverter csv = new ConditionStringConverter();
+                    value = csv.Write((Condition)rawValue);
+                }
+                else if (String.IsNullOrEmpty(converterName) && (rawValue != null))
+                {
+                    if (rawValue is decimal)
+                    {
+                        value = ((decimal)rawValue).ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        value = rawValue.ToString();
+                    }
+                }
+
+                if (value != null)
+                {
+                    retval.Add(name, value);
+                }
+            }
+
+            if (addKey)
+            {
+                retval.Add("key", BrickOwlClientConfiguration.Instance.ApiKey);
+            }
+
+            return retval;
+        } // !_ObjectToFormData()
     }
 }
