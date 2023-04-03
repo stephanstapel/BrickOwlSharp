@@ -26,22 +26,22 @@ Add an item to the inventory:
 
 ```C#
 NewInventoryResult newInventoryResult = await client.CreateInventoryAsync(new NewInventory()
-            {
-                Id = 414759, // Bracket 1 x 2 - 1 x 2 Inverted
-                Condition = Condition.New,
-                Quantity = 1,
-                Price = 1000.15m // make sure nobody will ever buy it :)
-            });
+{
+  Id = 414759, // Bracket 1 x 2 - 1 x 2 Inverted
+  Condition = Condition.New,
+  Quantity = 1,
+  Price = 1000.15m // make sure nobody will ever buy it :)
+});
 ```
 
 Update an item in the inventory:
 
 ```C#
 bool updateResult = await client.UpdateInventoryAsync(new UpdateInventory()
-            {
-                LotId = 107931517,
-                AbsoluteQuantity = 23                
-            }); 
+{
+  LotId = 107931517,
+  AbsoluteQuantity = 23                
+}); 
 ```
 In contrary to Bricklink API, BrickOwl allows to both update the quantity relatively and also absolutely. Accordingly, the library accepts either parameter.
 
@@ -49,9 +49,9 @@ To get an overview of the current inventory:
 
 ```C#
 foreach (Inventory inventory in await client.GetInventoryAsync())
-            {
-                Console.WriteLine($"{inventory.Id}: quantity {inventory.Quantity}, lot id: {inventory.LotId}");
-            }
+{
+  Console.WriteLine($"{inventory.Id}: quantity {inventory.Quantity}, lot id: {inventory.LotId}");
+}
 ```
 
 To delete an element from the inventory:
@@ -65,10 +65,10 @@ To receive the currently existing wishlists:
 ```C#
 Task<List<Wishlist>> wishlists = await client.GetWishlistsAsync();
 
-            foreach(Wishlist wishlist in wishlists.Result) 
-            {
-                Console.WriteLine($"{wishlist.Id}: {wishlist.Name}");
-            }
+foreach(Wishlist wishlist in wishlists.Result) 
+{
+  Console.WriteLine($"{wishlist.Id}: {wishlist.Name}");
+}
 ```
 
 
