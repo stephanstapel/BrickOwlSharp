@@ -72,6 +72,5 @@ foreach(Wishlist wishlist in wishlists.Result)
 ```
 
 
-
-
+## Further functionality
 If you should have further use cases you'd like to implement, drop an issue or - even better - drop a pull request.
