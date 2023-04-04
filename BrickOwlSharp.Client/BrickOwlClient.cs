@@ -161,7 +161,14 @@ namespace BrickOwlSharp.Client
 
                 message.Content = null;
                 var response = await _httpClient.SendAsync(message, cancellationToken);
-                response.EnsureSuccessStatusCode();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                catch
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url}");
+                }
 
                 var contentAsString = await response.Content.ReadAsStringAsync();
                 var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString);
@@ -183,7 +190,14 @@ namespace BrickOwlSharp.Client
             {
                 HttpContent content = new FormUrlEncodedContent(formData);
                 var response = await _httpClient.PostAsync(url, content, cancellationToken);
-                response.EnsureSuccessStatusCode();
+                try
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+                catch
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}");
+                }
 
                 var contentAsString = await response.Content.ReadAsStringAsync();
                 var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString);

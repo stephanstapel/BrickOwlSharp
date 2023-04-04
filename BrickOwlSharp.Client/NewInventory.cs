@@ -12,7 +12,7 @@ namespace BrickOwlSharp.Client
     public class NewInventory
     {
         [JsonPropertyName("boid")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [JsonPropertyName("color_id")]
         public int? ColorId { get; set; }
