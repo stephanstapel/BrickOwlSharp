@@ -63,12 +63,57 @@ namespace BrickOwlSharp.Client
             _isDisposed = true;
         }
 
+
         public async Task<List<Order>> GetOrdersAsync(
             CancellationToken cancellationToken = default)
         {
-            var url = new Uri(_baseUri, $"orders/list").ToString();
+            var url = new Uri(_baseUri, $"order/list").ToString();
             return await ExecuteGet<List<Order>>(url, cancellationToken);
-        }
+        } // !GetOrdersAsync()
+
+
+        public async Task<OrderDetails> GetOrderAsync(int orderId,  CancellationToken cancellationToken = default)
+        {
+            var detailsUrl = new Uri(_baseUri, $"order/view").ToString();
+            detailsUrl = AppendOptionalParam(detailsUrl, "order_id", orderId);
+            OrderDetails details = await ExecuteGet<OrderDetails>(detailsUrl, cancellationToken);
+
+            var itemUrl = new Uri(_baseUri, $"order/items").ToString();
+            itemUrl = AppendOptionalParam(itemUrl, "order_id", orderId);
+            List<OrderItem> items = await ExecuteGet<List<OrderItem>>(itemUrl, cancellationToken);
+            details.OrderItems = items;
+            return details;
+        } // !GetOrderAsync()
+
+
+        public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "order_id", orderId.ToString() },
+                { "status_id", ((int)status).ToString() },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, $"order/set_status").ToString();
+
+            try
+            {
+                BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+                if (result.Status.ToLower() == "success")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        } // !UpdateOrderStatusAsync()
 
 
         public async Task<List<Wishlist>> GetWishlistsAsync(
@@ -122,7 +167,7 @@ namespace BrickOwlSharp.Client
            DeleteInventory deleteInventory,
            CancellationToken cancellationToken = default)
         {
-            Dictionary<string, string> formData = _ObjectToFormData(deleteInventory);
+            Dictionary<string, string> formData = _ObjectToFormData(deleteInventory);            
 
             var url = new Uri(_baseUri, $"inventory/delete").ToString();
             BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
@@ -189,9 +234,20 @@ namespace BrickOwlSharp.Client
             using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
                 HttpContent content = new FormUrlEncodedContent(formData);
-                var response = await _httpClient.PostAsync(url, content, cancellationToken);
+                HttpResponseMessage response = null;
                 try
                 {
+                    Task< HttpResponseMessage> responseTask = _httpClient.PostAsync(url, content, cancellationToken);
+                    responseTask.Wait();
+                    response = responseTask.Result;
+                }
+                catch (Exception ex)
+                {
+                    throw new HttpRequestException($"Could not execute request for url {url}");
+                }
+
+                try
+                { 
                     response.EnsureSuccessStatusCode();
                 }
                 catch

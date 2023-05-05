@@ -31,21 +31,21 @@ using BrickOwlSharp;
 
 namespace BrickOwlSharp.Client.Json
 {
-    internal class IntStringConverter : JsonConverter<int>
+    internal class OrderStatusStringConverter : JsonConverter<OrderStatus>
     {
-        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override OrderStatus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var stringValue = reader.GetString();
             if (Int32.TryParse(stringValue, out int value))
             {
-                return value;
+                return (OrderStatus)value;
             }
             return default(Int32);
         }
 
-        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, OrderStatus value, JsonSerializerOptions options)
         {            
-            var typeString = value.ToString();
+            var typeString = ((int)value).ToString();
             writer.WriteStringValue(typeString);
         }
     }

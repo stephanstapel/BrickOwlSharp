@@ -10,6 +10,8 @@ namespace BrickOwlSharp.Client
     public interface IBrickOwlClient
     {
         Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken = default);
+        Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
+        Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
         Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
         Task<NewInventoryResult> CreateInventoryAsync(NewInventory newInventory, CancellationToken cancellationToken = default);
         Task<bool> UpdateInventoryAsync(
