@@ -80,6 +80,7 @@ Order status can also be changed,
 bool result = await client.UpdateOrderStatusAsync(12345, OrderStatus.Processed);
 ```
 
+Please note: If the status you are passing to the function has already been reached or surpassed, false is returned as a result.
 
 ## Wishlist
 To receive the currently existing wishlists:
