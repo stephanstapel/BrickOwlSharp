@@ -60,6 +60,27 @@ To delete an element from the inventory:
 bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = 107931627 });
 ```
 
+## Orders
+To receive a list of orders, invoke:
+```C#
+List<Order> allOrders = await client.GetOrdersAsync();
+```
+
+This information does not include the order items or the buyer details. If you need this information, call:
+
+```C#
+OrderDetails orderDetails = await client.GetOrderAsync(12345);
+```
+
+All  fields from the actual API are mapped. In case you have a better idea how to aggregate them or how to add sub classes for better structuring, drop me a note (or a PR).
+
+Order status can also be changed, 
+
+```C#
+bool result = await client.UpdateOrderStatusAsync(12345, OrderStatus.Processed);
+```
+
+
 ## Wishlist
 To receive the currently existing wishlists:
 ```C#
