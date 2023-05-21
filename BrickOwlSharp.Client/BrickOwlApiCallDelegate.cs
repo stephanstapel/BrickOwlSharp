@@ -22,26 +22,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client;
-using BrickOwlSharp.Demos;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-internal static class Program
+namespace BrickOwlSharp.Client
 {
-    static async Task<int> Main()
-    {
-        BrickOwlClientConfiguration.Instance.ApiKey = "----";
-        BrickOwlClientConfiguration.Instance.ApiCallEvent += new BrickOwlApiCallDelegate(() =>
-        {
-            Console.WriteLine($"API called");
-        });
-
-        /*
-        WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        */
-
-        InventoryDemo demo = new InventoryDemo();
-        await demo.RunAsync();
-        return 0;
-    }
+    public delegate void BrickOwlApiCallDelegate();
 }

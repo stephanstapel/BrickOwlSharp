@@ -33,6 +33,8 @@ namespace BrickOwlSharp.Client
     public class BrickOwlClientConfiguration
     {
         public string ApiKey { get; set; }
+        public event BrickOwlApiCallDelegate ApiCallEvent;
+
 
         private static BrickOwlClientConfiguration _instance;
         public static BrickOwlClientConfiguration Instance
@@ -52,9 +54,15 @@ namespace BrickOwlSharp.Client
         {
         }
 
+
         internal void ValidateThrowException()
         {
-
         }
+
+
+        internal void InvokeEventCounter()
+        {
+            ApiCallEvent?.Invoke();
+        } // !InvokeEventCounter()
     }
 }
