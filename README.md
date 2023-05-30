@@ -93,6 +93,24 @@ foreach(Wishlist wishlist in wishlists.Result)
 }
 ```
 
+## Measuring API call rate
+As the available API calls per day are limited, you can collect the API call rate using a .net event.
+You can simply subscribe to the event by adding a handler to this event:
+
+```C#
+BrickOwlClientConfiguration.Instance.ApiCallEvent
+```
+
+the most simply way is:
+
+```C#
+BrickOwlClientConfiguration.Instance.ApiCallEvent += new BrickOwlApiCallDelegate(() =>
+        {
+            Console.WriteLine($"API called");
+        });
+```
+
+In reality, you might want to increase a counter in a database or a counter in a monitoring system like Prometheus.
 
 ## Further functionality
 If you should have further use cases you'd like to implement, drop an issue or - even better - drop a pull request.
