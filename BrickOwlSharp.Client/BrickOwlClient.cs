@@ -45,13 +45,15 @@ namespace BrickOwlSharp.Client
         private readonly bool _disposeHttpClient;
 
         private bool _isDisposed;
-        private BrickOwlApiCallDelegate _event;
+        private IBrickOwlRequestHandler _requestHandler;
 
         public BrickOwlClient(HttpClient httpClient,
-            bool disposeHttpClient)
+            bool disposeHttpClient,
+            IBrickOwlRequestHandler requestHandler = null)
         {
             _httpClient = httpClient;
             _disposeHttpClient = disposeHttpClient;
+            _requestHandler = requestHandler;
         }
 
         ~BrickOwlClient()
@@ -94,7 +96,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, $"order/list").ToString();
             List<Order> result = await ExecuteGet<List<Order>>(url, cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             return result;
         } // !GetOrdersAsync()
 
@@ -104,12 +106,12 @@ namespace BrickOwlSharp.Client
             var detailsUrl = new Uri(_baseUri, $"order/view").ToString();
             detailsUrl = AppendOptionalParam(detailsUrl, "order_id", orderId);
             OrderDetails details = await ExecuteGet<OrderDetails>(detailsUrl, cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
 
             var itemUrl = new Uri(_baseUri, $"order/items").ToString();
             itemUrl = AppendOptionalParam(itemUrl, "order_id", orderId);
             List<OrderItem> items = await ExecuteGet<List<OrderItem>>(itemUrl, cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             details.OrderItems = items;
             return details;
         } // !GetOrderAsync()
@@ -129,7 +131,7 @@ namespace BrickOwlSharp.Client
             try
             {
                 BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _InvokeEventCounter();
+                _measureRequest(cancellationToken);
                 if (result.Status.ToLower() == "success")
                 {
                     return true;
@@ -151,7 +153,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, $"wishlist/lists").ToString();
             List<Wishlist> result = await ExecuteGet<List<Wishlist>>(url, cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             return result;
         }
 
@@ -164,7 +166,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"inventory/create").ToString();
             NewInventoryResult result = await ExeucutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             return result;
         }        
 
@@ -177,7 +179,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"inventory/update").ToString();
             BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             return (result?.Status == "success");
         }
 
@@ -194,7 +196,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "lot_id", lotId);
 
             List<Inventory> result = await ExecuteGet<List<Inventory>>(url, cancellationToken);
-            _InvokeEventCounter();
+            _measureRequest(cancellationToken);
             return result;
         } // !GetInventoryAsync()
 
@@ -242,7 +244,7 @@ namespace BrickOwlSharp.Client
 
                 message.Content = null;
                 var response = await _httpClient.SendAsync(message, cancellationToken);
-                _InvokeEventCounter();
+                _measureRequest(cancellationToken);
                 try
                 {
                     response.EnsureSuccessStatusCode();
@@ -275,7 +277,7 @@ namespace BrickOwlSharp.Client
                 try
                 {
                     Task< HttpResponseMessage> responseTask = _httpClient.PostAsync(url, content, cancellationToken);
-                    _InvokeEventCounter();
+                    _measureRequest(cancellationToken);
                     responseTask.Wait();
                     response = responseTask.Result;
                 }
@@ -366,9 +368,13 @@ namespace BrickOwlSharp.Client
         } // !_ObjectToFormData()
 
 
-        private void _InvokeEventCounter()
+        private async void _measureRequest(CancellationToken cancellationToken = default)
         {
-            BrickOwlClientConfiguration.Instance.InvokeEventCounter();
-        } // !_InvokeEventCounter()
+            if (this._requestHandler != null)
+            {
+                CancellationTokenSource source = new CancellationTokenSource();
+                await this._requestHandler.OnRequestAsync(cancellationToken);
+            }
+        }
     }
 }
