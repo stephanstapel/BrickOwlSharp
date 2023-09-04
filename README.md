@@ -1,4 +1,6 @@
 # BrickOwlSharp
+[![NuGet](https://img.shields.io/nuget/v/BrickOwlSharp.Client?color=blue)](https://www.nuget.org/packages/BrickOwlSharp.Client/1.0.0)
+
 
 BrickOwlSharp is a C# library for interacting with the BrickOwl API. It provides a simple and intuitive interface for developers to access the full functionality of the BrickOwl platform, including searching for LEGO parts, sets, and minifigures, managing orders and inventory, and much more.
 
