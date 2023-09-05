@@ -29,7 +29,7 @@ internal static class Program
 {
     static async Task<int> Main()
     {
-        BrickOwlClientConfiguration.Instance.ApiKey = "5b855cb9aeaf2122398e71ec3139993688f0f74a3988247de6d2109667d878ab";
+        BrickOwlClientConfiguration.Instance.ApiKey = "";
         BrickOwlClientConfiguration.Instance.ApiCallEvent += new BrickOwlApiCallDelegate(() =>
         {
             Console.WriteLine($"API called");
