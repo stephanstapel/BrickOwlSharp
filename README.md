@@ -84,6 +84,48 @@ bool result = await client.UpdateOrderStatusAsync(12345, OrderStatus.Processed);
 
 Please note: If the status you are passing to the function has already been reached or surpassed, false is returned as a result.
 
+## Catalog
+BrickOwl provides a wide range of endpoints for retrieving various information about its catalog.
+To access these functions, BrickOwl administrators have to grant access, see https://www.brickowl.com/api_docs for more details.
+
+To retrieve the entire catalog, currently approximately 260,000 items:
+```C#
+Task<List<CatalogItem>> catalog = client.GetCatalogAsync();
+catalog.Wait();
+
+foreach(CatalogItem catalogItem in catalog.Result) 
+{
+    Console.WriteLine($"{catalogItem.Id}: {catalogItem.Name}");
+}
+```
+
+Instead of retrieving the entire catalog, you can lookup single items:
+
+```C#
+Task<CatalogItem> item = client.CatalogLookupAsync("737117-39");
+item.Wait();
+```
+
+This function will retrieve information about the antenna part.
+
+To find out in which shops a particular item is available, call:
+
+```C#
+Task<Dictionary<string, CatalogItemAvailability>> availability = client.CatalogAvailabilityAsync("737117-39", "DE");
+availability.Wait(); 
+```
+
+This call will return a dictionary with the shop id as the key and availability information as the value.
+
+To find out the BrickOwl ids for particular design ids, ldraw ids etc., call:
+
+```C#
+Task<List<string>> boids = client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
+boids.Wait();
+```
+
+This call will return all BrickOwl ids (approximately 60 in this case).
+
 ## Wishlist
 To receive the currently existing wishlists:
 ```C#
