@@ -26,7 +26,6 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using BrickOwlSharp.Client.Extensions;
 using BrickOwlSharp;
 
 namespace BrickOwlSharp.Client.Json
@@ -56,27 +55,13 @@ namespace BrickOwlSharp.Client.Json
     {
         public override Condition Read(string value)
         {
-            switch (value)
-            {
-                case "new": return Condition.New;
-                case "news": return Condition.NewSealed;
-                case "newc": return Condition.NewComplete;
-                case "newi": return Condition.NewIncomplete;
-                case "usedc": return Condition.UsedComplete;
-                case "usedi": return Condition.UsedIncomplete;
-                case "usedn": return Condition.UsedLikeNew;
-                case "usedg": return Condition.UsedGood;
-                case "useda": return Condition.UsedAcceptable;
-                case "other": return Condition.Other;
-                default:
-                    return Condition.Other;
-            }
+            return default(Condition).FromString(value);
         }
         
 
         public override string Write(Condition value)
         {
-            return value.ToDomainString();
+            return value.EnumToString();
         }
     }
 }

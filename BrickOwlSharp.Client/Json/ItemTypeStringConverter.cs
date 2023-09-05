@@ -27,33 +27,34 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BrickOwlSharp;
-using System.Globalization;
 
 namespace BrickOwlSharp.Client.Json
 {
-    internal class NullableDecimalStringConverter : JsonConverter<decimal?>
+    internal class ItemTypeStringConverter : JsonConverter<ItemType>
     {
-        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {            
+        public override ItemType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
             var stringValue = reader.GetString();
-            if (decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
+
+            switch (stringValue)
             {
-                return value;
+                case "Part": return ItemType.Part;
             }
-            return null;
+
+            return ItemType.Unknown;
         }
 
-        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ItemType value, JsonSerializerOptions options)
         {
-            if (value.HasValue)
+            string typeString = "";
+
+            switch (value)
             {
-                var typeString = value.ToString();
-                writer.WriteStringValue(typeString);
+                case ItemType.Part: typeString = "Part"; break;
             }
-            else
-            {
-                writer.WriteStringValue(""); // ???
-            }            
+
+
+            writer.WriteStringValue(typeString);
         }
     }
 }

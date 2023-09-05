@@ -37,6 +37,11 @@ namespace BrickOwlSharp.Client
         Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
         Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
         Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
+        Task<List<CatalogItem>> GetCatalogAsync(CancellationToken cancellationToken = default);
+
+        Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default);
+        Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default);
+        Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default);
         Task<NewInventoryResult> CreateInventoryAsync(NewInventory newInventory, CancellationToken cancellationToken = default);
         Task<bool> UpdateInventoryAsync(
             UpdateInventory updatedInventory,

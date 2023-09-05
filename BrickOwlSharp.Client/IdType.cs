@@ -24,15 +24,50 @@
 # endregion
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace BrickOwlSharp.Client
 {
-    public interface IBrickOwlRequestHandler
+    public enum IdType
     {
-        Task OnRequestAsync(CancellationToken ct);
+        Unknown,
+        DesignId,
+        LDraw,
+        BOID,
+        ItemNo,
+        SetNumber
+    }
+
+
+    internal static class IdTypeExtensions
+    {
+        public static IdType FromString(this IdType _, string s)
+        {
+            switch (s)
+            {
+                case "design_d": return IdType.DesignId;
+                case "ldraw": return IdType.LDraw;
+                case "boid": return IdType.BOID;
+                case "item_no": return IdType.ItemNo;
+                case "set_number": return IdType.SetNumber;
+            }
+
+            return IdType.Unknown;
+        } // !FromString()
+
+
+        public static string EnumToString(this IdType c)
+        {
+            switch (c)
+            {                        
+                case IdType.DesignId: return "design_id";
+                case IdType.LDraw: return "ldraw";
+                case IdType.BOID: return "boid";
+                case IdType.ItemNo: return "item_no";
+                case IdType.SetNumber: return "set_number";
+            }
+
+            return "";
+        } // !EnumToString()
     }
 }

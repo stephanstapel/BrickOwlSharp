@@ -30,6 +30,14 @@ namespace BrickOwlSharp.Client
 {
     public enum ItemType
     {
-        Part
+        Unknown,
+        Part,
+        Set,
+        Minifigure,
+        Gear,
+        Sticker,
+        Minibuild,
+        Instructions,
+        Packaging
     }
 }

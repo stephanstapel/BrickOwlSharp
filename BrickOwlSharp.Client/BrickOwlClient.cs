@@ -22,7 +22,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client.Extensions;
 using BrickOwlSharp.Client.Json;
 using System;
 using System.Collections.Generic;
@@ -130,7 +129,7 @@ namespace BrickOwlSharp.Client
 
             try
             {
-                BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
                 _measureRequest(cancellationToken);
                 if (result.Status.ToLower() == "success")
                 {
@@ -158,6 +157,60 @@ namespace BrickOwlSharp.Client
         }
 
 
+        public async Task<List<CatalogItem>> GetCatalogAsync(
+           CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/list").ToString();
+            List<CatalogItem> result = await ExecuteGet<List<CatalogItem>>(url, cancellationToken);
+            _measureRequest(cancellationToken);
+            return result;
+        }
+
+
+        public async Task<Dictionary<string,CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/availability").ToString();
+            url = AppendOptionalParam(url, "boid", boid);
+            url = AppendOptionalParam(url, "country", country);
+
+            if (quantity.HasValue)
+            {
+                url = AppendOptionalParam(url, "quantity", quantity.ToString());
+            }
+
+            Dictionary<string, CatalogItemAvailability> result = await ExecuteGet<Dictionary<string, CatalogItemAvailability>>(url, cancellationToken);
+            _measureRequest(cancellationToken);
+            return result;
+        }
+
+
+        public async Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/lookup").ToString();
+            url = AppendOptionalParam(url, "boid", boid);
+            CatalogItem result = await ExecuteGet<CatalogItem> (url, cancellationToken);
+            _measureRequest(cancellationToken);
+            return result;
+        }
+
+
+        public async Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/id_lookup").ToString();
+            url = AppendOptionalParam(url, "id", boid);
+            url = AppendOptionalParam(url, "type", type.ToString());
+
+            if (idType.HasValue)
+            {
+                url = AppendOptionalParam(url, "id_type", idType.Value.EnumToString());
+            }
+
+            CatalogItemIds result = await ExecuteGet<CatalogItemIds>(url, cancellationToken);
+            _measureRequest(cancellationToken);
+            return result.BOIDs;
+        }
+
+
         public async Task<NewInventoryResult> CreateInventoryAsync(
             NewInventory newInventory,
             CancellationToken cancellationToken = default)
@@ -165,7 +218,7 @@ namespace BrickOwlSharp.Client
             Dictionary<string, string> formData = _ObjectToFormData(newInventory);
 
             var url = new Uri(_baseUri, $"inventory/create").ToString();
-            NewInventoryResult result = await ExeucutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
+            NewInventoryResult result = await ExecutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(cancellationToken);
             return result;
         }        
@@ -178,7 +231,7 @@ namespace BrickOwlSharp.Client
             Dictionary<string, string> formData = _ObjectToFormData(updatedInventory);
 
             var url = new Uri(_baseUri, $"inventory/update").ToString();
-            BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+            BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(cancellationToken);
             return (result?.Status == "success");
         }
@@ -208,7 +261,7 @@ namespace BrickOwlSharp.Client
             Dictionary<string, string> formData = _ObjectToFormData(deleteInventory);            
 
             var url = new Uri(_baseUri, $"inventory/delete").ToString();
-            BrickOwlResult result = await ExeucutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+            BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
             return (result?.Status == "success");
         } // !GetInventoryAsync()
 
@@ -265,10 +318,10 @@ namespace BrickOwlSharp.Client
 
                 return responseData;
             }            
-        } // !ExecuteGet
+        } // !ExecuteGet()
           
 
-        private async Task<TResponse> ExeucutePost<TResponse>(string url, Dictionary<string, string> formData, CancellationToken cancellationToken = default)
+        private async Task<TResponse> ExecutePost<TResponse>(string url, Dictionary<string, string> formData, CancellationToken cancellationToken = default)
         {            
             using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
@@ -306,7 +359,7 @@ namespace BrickOwlSharp.Client
 
                 return responseData;
             }
-        } // !ExeucutePost()
+        } // !ExecutePost()
 
 
         Dictionary<string, string> _ObjectToFormData(object o, bool addKey = true)

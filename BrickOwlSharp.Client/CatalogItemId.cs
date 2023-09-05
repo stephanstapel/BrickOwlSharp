@@ -1,5 +1,5 @@
 ﻿#region License
-// Copyright (c) 2020 Jens Eisenbach
+// Copyright (c) 2023 Stephan Stapel
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,39 +21,21 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-#endregion
-
+# endregion
+using BrickOwlSharp.Client.Json;
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Text;
 using System.Text.Json.Serialization;
-using BrickOwlSharp;
-using System.Globalization;
 
-namespace BrickOwlSharp.Client.Json
-{
-    internal class NullableDecimalStringConverter : JsonConverter<decimal?>
+namespace BrickOwlSharp.Client
+{    
+    public partial class CatalogItemId
     {
-        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {            
-            var stringValue = reader.GetString();
-            if (decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
-            {
-                return value;
-            }
-            return null;
-        }
-
-        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
-        {
-            if (value.HasValue)
-            {
-                var typeString = value.ToString();
-                writer.WriteStringValue(typeString);
-            }
-            else
-            {
-                writer.WriteStringValue(""); // ???
-            }            
-        }
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+        
+        [JsonPropertyName("type"), JsonConverter(typeof(IdTypesStringConverter))]
+        public IdType Type { get; set; }
     }
 }

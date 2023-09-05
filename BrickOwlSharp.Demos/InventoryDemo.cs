@@ -39,7 +39,7 @@ namespace BrickOwlSharp.Demos
 
             NewInventoryResult newInventoryResult = await client.CreateInventoryAsync(new NewInventory()
             {
-                Id = 414759, // Bracket 1 x 2 - 1 x 2 Inverted
+                Id = "414759", // Bracket 1 x 2 - 1 x 2 Inverted
                 Condition = Condition.New,
                 Quantity = 1,
                 Price = 1000.15m // make sure nobody will ever buy it :)

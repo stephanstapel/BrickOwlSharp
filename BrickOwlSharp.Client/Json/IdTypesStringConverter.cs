@@ -24,26 +24,42 @@
 #endregion
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace BrickOwlSharp.Client.Extensions
+using BrickOwlSharp;
+
+namespace BrickOwlSharp.Client.Json
 {
-    internal static class EnumExtensions
+    internal class IdTypesStringConverter : JsonConverter<IdType>
     {
-        internal static string ToDomainString(this Condition condition)
+        public override IdType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            switch (condition)
+            var stringValue = reader.GetString();
+
+            switch (stringValue)
             {
-                case Condition.New: return "new";
-                case Condition.NewSealed: return "news";
-                case Condition.NewComplete: return "newc";
-                case Condition.NewIncomplete: return "newi";
-                case Condition.UsedComplete: return "usedc";
-                case Condition.UsedIncomplete: return "usedi";
-                case Condition.UsedLikeNew: return "usedn";
-                case Condition.UsedGood: return "usedg";
-                case Condition.UsedAcceptable: return "useda";
-                default: return "other";
+                case "design_id": return IdType.DesignId;
+                case "ldraw": return IdType.LDraw;
+                case "boid": return IdType.BOID;
+                case "item_no": return IdType.ItemNo;
             }
+
+            return IdType.Unknown;
+        }
+
+        public override void Write(Utf8JsonWriter writer, IdType value, JsonSerializerOptions options)
+        {
+            string typeString = "";
+            switch (value)
+            {
+                case IdType.DesignId: typeString = "design_id"; break;
+                case IdType.LDraw: typeString = "ldraw"; break;
+                case IdType.BOID: typeString = "boid"; break;
+                case IdType.ItemNo: typeString = "item_no"; break;
+            }
+
+            writer.WriteStringValue(typeString);
         }
     }
 }

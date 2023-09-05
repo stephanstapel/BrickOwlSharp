@@ -43,4 +43,47 @@ namespace BrickOwlSharp.Client
         UsedAcceptable,
         Other
     }
+
+
+    internal static class ConditionExtensions
+    {
+        public static Condition FromString(this Condition _, string s)
+        {
+            switch (s)
+            {
+                case "new": return Condition.New;
+                case "news": return Condition.NewSealed;
+                case "newc": return Condition.NewComplete;
+                case "newi": return Condition.NewIncomplete;
+                case "usedc": return Condition.UsedComplete;
+                case "usedi": return Condition.UsedIncomplete;
+                case "usedn": return Condition.UsedLikeNew;
+                case "usedg": return Condition.UsedGood;
+                case "useda": return Condition.UsedAcceptable;
+                case "other": return Condition.Other;
+                default:
+                    return Condition.Other;
+            }
+        } // !FromString()
+
+
+        public static string EnumToString(this Condition c)
+        {
+            switch (c)
+            {
+                case Condition.New: return "new";
+                case Condition.NewSealed: return "news";
+                case Condition.NewComplete: return "newc";
+                case Condition.NewIncomplete: return "newi";
+                case Condition.UsedComplete: return "usedc";
+                case Condition.UsedIncomplete: return "usedi";
+                case Condition.UsedLikeNew: return "usedn";
+                case Condition.UsedGood: return "usedg";
+                case Condition.UsedAcceptable: return "useda";
+                case Condition.Other: return "other";
+            }
+
+            return "";
+        } // !EnumToString()
+    }
 }

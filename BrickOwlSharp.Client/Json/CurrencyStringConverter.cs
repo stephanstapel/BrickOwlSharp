@@ -1,5 +1,5 @@
 ﻿#region License
-// Copyright (c) 2020 Jens Eisenbach
+// Copyright (c) 2023 Stephan Stapel
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,39 +21,27 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-#endregion
-
+# endregion
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Text;
 using System.Text.Json.Serialization;
-using BrickOwlSharp;
-using System.Globalization;
+using System.Text.Json;
 
 namespace BrickOwlSharp.Client.Json
 {
-    internal class NullableDecimalStringConverter : JsonConverter<decimal?>
+    internal class CurrencyStringConverter : JsonConverter<Currency>
     {
-        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {            
+        public override Currency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
             var stringValue = reader.GetString();
-            if (decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
-            {
-                return value;
-            }
-            return null;
+            return default(Currency).FromString(stringValue);
         }
 
-        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, Currency value, JsonSerializerOptions options)
         {
-            if (value.HasValue)
-            {
-                var typeString = value.ToString();
-                writer.WriteStringValue(typeString);
-            }
-            else
-            {
-                writer.WriteStringValue(""); // ???
-            }            
+            string typeString = value.EnumToString();
+            writer.WriteStringValue(typeString);
         }
     }
 }

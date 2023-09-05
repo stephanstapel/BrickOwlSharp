@@ -1,5 +1,5 @@
 ﻿#region License
-// Copyright (c) 2020 Jens Eisenbach
+// Copyright (c) 2023 Stephan Stapel
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -21,39 +21,42 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-#endregion
+# endregion
+using BrickOwlSharp.Client;
 
-using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using BrickOwlSharp;
-using System.Globalization;
 
-namespace BrickOwlSharp.Client.Json
+namespace BrickOwlSharp.Demos
 {
-    internal class NullableDecimalStringConverter : JsonConverter<decimal?>
+    internal class CatalogDemo
     {
-        public override decimal? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {            
-            var stringValue = reader.GetString();
-            if (decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
-            {
-                return value;
-            }
-            return null;
-        }
-
-        public override void Write(Utf8JsonWriter writer, decimal? value, JsonSerializerOptions options)
+        internal void Run()
         {
-            if (value.HasValue)
+            IBrickOwlClient client = BrickOwlClientFactory.Build();
+
+            /*
+            Task<List<string>> boids = client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
+            boids.Wait();
+
+            // retrieve item availability
+            Task<Dictionary<string, CatalogItemAvailability>> availability = client.CatalogAvailabilityAsync("737117-39", "DE");
+            availability.Wait();            
+
+            // retrieve a single catalog item
+            Task<CatalogItem> item = client.CatalogLookupAsync("737117-39");
+            item.Wait();
+            
+          
+            // retrieve the entire catalog
+            Task<List<CatalogItem>> catalog = client.GetCatalogAsync();
+            catalog.Wait();
+
+            foreach(CatalogItem catalogItem in catalog.Result) 
             {
-                var typeString = value.ToString();
-                writer.WriteStringValue(typeString);
+                Console.WriteLine($"{catalogItem.Id}: {catalogItem.Name}");
             }
-            else
-            {
-                writer.WriteStringValue(""); // ???
-            }            
+            */
+
+            Task.WaitAll();          
         }
     }
 }
