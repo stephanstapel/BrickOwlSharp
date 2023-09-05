@@ -11,4 +11,10 @@
     <ProjectReference Include="..\BrickOwlSharp.Client\BrickOwlSharp.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="apikey.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
