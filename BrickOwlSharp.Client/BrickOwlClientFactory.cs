@@ -38,9 +38,23 @@ namespace BrickOwlSharp.Client
             return new BrickOwlClient(httpClient, disposeHttpClient, requestHandler);
         }
 
-        public static IBrickOwlClient Build(HttpClient httpClient, IBrickOwlRequestHandler requestHandler = null)
+        public static IBrickOwlClient Build(HttpClient httpClient = null, IBrickOwlRequestHandler requestHandler = null)
         {
-            return Build(httpClient, false, requestHandler);
+            HttpClient _httpClient = null;
+            bool _disposeHttpClient = false;
+            
+            if (httpClient == null)
+            {
+                _httpClient = new HttpClient();
+                _disposeHttpClient = true;
+            }
+            else
+            {
+                _httpClient = httpClient;
+                _disposeHttpClient = false;
+            }            
+
+            return Build(_httpClient, _disposeHttpClient, requestHandler);
         }
 
         public static IBrickOwlClient Build()

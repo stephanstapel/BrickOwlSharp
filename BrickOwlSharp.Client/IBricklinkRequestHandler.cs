@@ -33,6 +33,6 @@ namespace BrickOwlSharp.Client
 {
     public interface IBrickOwlRequestHandler
     {
-        Task OnRequestAsync(CancellationToken ct);
+        Task OnRequestAsync(ResourceType resourceType, CancellationToken ct);
     }
 }
