@@ -99,6 +99,11 @@ foreach(CatalogItem catalogItem in catalog.Result)
 }
 ```
 
+Each item in the resulting list looks like this:
+
+![grafik](https://github.com/stephanstapel/BrickOwlSharp/assets/2912080/c4d72358-4de4-4c65-8f18-afbf49085bd9)
+
+
 Instead of retrieving the entire catalog, you can lookup single items:
 
 ```C#
@@ -106,7 +111,7 @@ Task<CatalogItem> item = client.CatalogLookupAsync("737117-39");
 item.Wait();
 ```
 
-This function will retrieve information about the antenna part.
+This function will retrieve information about the antenna part only.
 
 To find out in which shops a particular item is available, call:
 
@@ -114,8 +119,11 @@ To find out in which shops a particular item is available, call:
 Task<Dictionary<string, CatalogItemAvailability>> availability = client.CatalogAvailabilityAsync("737117-39", "DE");
 availability.Wait(); 
 ```
-
 This call will return a dictionary with the shop id as the key and availability information as the value.
+Each element in the dictionary looks like this:
+
+![grafik](https://github.com/stephanstapel/BrickOwlSharp/assets/2912080/2c72340e-46b5-4995-a209-e97de8245da1)
+
 
 To find out the BrickOwl ids for particular design ids, ldraw ids etc., call:
 
