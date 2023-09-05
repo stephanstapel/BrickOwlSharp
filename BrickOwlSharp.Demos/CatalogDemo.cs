@@ -32,14 +32,14 @@ namespace BrickOwlSharp.Demos
         internal void Run()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
-
-            /*
+           
             Task<List<string>> boids = client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
             boids.Wait();
 
             // retrieve item availability
             Task<Dictionary<string, CatalogItemAvailability>> availability = client.CatalogAvailabilityAsync("737117-39", "DE");
             availability.Wait();            
+
 
             // retrieve a single catalog item
             Task<CatalogItem> item = client.CatalogLookupAsync("737117-39");
@@ -54,7 +54,7 @@ namespace BrickOwlSharp.Demos
             {
                 Console.WriteLine($"{catalogItem.Id}: {catalogItem.Name}");
             }
-            */
+            
 
             Task.WaitAll();          
         }
