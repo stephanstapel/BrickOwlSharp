@@ -39,6 +39,13 @@ namespace BrickOwlSharp.Client.Json
             switch (stringValue)
             {
                 case "Part": return ItemType.Part;
+                case "Minibuild": return ItemType.Minibuild;
+                case "Packaging": return ItemType.Packaging;
+                case "Set": return ItemType.Set;
+                case "Instructions": return ItemType.Instructions;
+                case "Gear": return ItemType.Gear;
+                case "Minifigure": return ItemType.Minifigure;
+                case "Sticker": return ItemType.Sticker;
             }
 
             return ItemType.Unknown;
@@ -51,6 +58,13 @@ namespace BrickOwlSharp.Client.Json
             switch (value)
             {
                 case ItemType.Part: typeString = "Part"; break;
+                case ItemType.Minibuild: typeString = "Minibuild"; break;
+                case ItemType.Packaging: typeString = "Packaging"; break;
+                case ItemType.Set: typeString = "Set"; break;
+                case ItemType.Instructions: typeString = "Instructions"; break;
+                case ItemType.Gear: typeString = "Gear"; break;
+                case ItemType.Minifigure: typeString = "Minifigure"; break;
+                case ItemType.Sticker: typeString = "Sticker"; break;
             }
 
 

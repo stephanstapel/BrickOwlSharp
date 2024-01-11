@@ -59,9 +59,9 @@ namespace BrickOwlSharp.Client
 
         [JsonPropertyName("color_name")]
         public string ColorName { get; set; }
-
+        
         [JsonPropertyName("color_id"), JsonConverter(typeof(IntStringConverter))]
-        public int ColorId { get; set; }
+        public int ColorId { get; set; }        
 
         [JsonPropertyName("color_hex")]
         public string ColorHex { get; set; }

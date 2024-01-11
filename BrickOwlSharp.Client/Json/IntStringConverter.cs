@@ -34,10 +34,26 @@ namespace BrickOwlSharp.Client.Json
     {
         public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var stringValue = reader.GetString();
-            if (Int32.TryParse(stringValue, out int value))
+            try
             {
-                return value;
+                var stringValue = reader.GetString();
+                if (Int32.TryParse(stringValue, out int value))
+                {
+                    return value;
+                }
+            }
+            catch
+            {                
+            }
+
+            try
+            {
+                var intValue = reader.GetInt32();
+                return intValue;
+            }
+            catch
+            {
+
             }
             return default(Int32);
         }

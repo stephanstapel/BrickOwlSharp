@@ -35,7 +35,10 @@ namespace BrickOwlSharp.Client
         LDraw,
         BOID,
         ItemNo,
-        SetNumber
+        SetNumber,
+        BLItemNo,
+        UPC,
+        EAN
     }
 
 
@@ -50,6 +53,9 @@ namespace BrickOwlSharp.Client
                 case "boid": return IdType.BOID;
                 case "item_no": return IdType.ItemNo;
                 case "set_number": return IdType.SetNumber;
+                case "bl_item_no": return IdType.BLItemNo;
+                case "ean": return IdType.EAN;
+                case "upc": return IdType.UPC;
             }
 
             return IdType.Unknown;
@@ -65,6 +71,9 @@ namespace BrickOwlSharp.Client
                 case IdType.BOID: return "boid";
                 case IdType.ItemNo: return "item_no";
                 case IdType.SetNumber: return "set_number";
+                case IdType.BLItemNo: return "bl_item_no";
+                case IdType.EAN: return "ean";
+                case IdType.UPC: return "upc";
             }
 
             return "";
