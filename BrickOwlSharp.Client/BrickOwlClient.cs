@@ -131,7 +131,7 @@ namespace BrickOwlSharp.Client
             {
                 BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
                 _measureRequest(ResourceType.Order, cancellationToken);
-                if (result.Status.ToLower() == "success")
+                if (string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
