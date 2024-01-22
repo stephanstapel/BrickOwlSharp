@@ -217,6 +217,11 @@ namespace BrickOwlSharp.Client
         {
             Dictionary<string, string> formData = _ObjectToFormData(newInventory);
 
+            if (!newInventory.ColorId.HasValue)
+            {
+                formData.Remove("color_id");
+            }
+
             var url = new Uri(_baseUri, $"inventory/create").ToString();
             NewInventoryResult result = await ExecutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Inventory, cancellationToken);
