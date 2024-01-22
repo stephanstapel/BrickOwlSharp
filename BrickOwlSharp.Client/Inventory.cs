@@ -89,5 +89,8 @@ namespace BrickOwlSharp.Client
 
         [JsonPropertyName("type")]
         public string Type{ get; set; }
+
+        [JsonPropertyName("tier_price"), JsonConverter(typeof(TierPriceListConverter))]
+        public List<TierPrice> TierPrices { get; set; }
     }
 }
