@@ -1,5 +1,5 @@
 ﻿#region License
-// Copyright (c) 2023 Stephan Stapel
+// Copyright (c) 2024 Stephan Stapel
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
