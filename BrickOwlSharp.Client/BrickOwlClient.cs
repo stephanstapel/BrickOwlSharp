@@ -249,7 +249,12 @@ namespace BrickOwlSharp.Client
             var url = new Uri(_baseUri, $"inventory/list").ToString();
 
             url = AppendOptionalParam(url, "filter", filter);
-            url = AppendOptionalParam(url, "active_only", activeOnly);
+
+            if (activeOnly.HasValue)
+            {               
+                url = AppendOptionalParam(url, "active_only", activeOnly.Value == true ? 1 : 0);
+            }
+
             url = AppendOptionalParam(url, "external_id_1", externalId);
             url = AppendOptionalParam(url, "lot_id", lotId);
 
