@@ -40,7 +40,7 @@ namespace BrickOwlSharp.Client
         {
             get
             {
-                if (BrickOwlClientConfiguration._instance == null)
+                if (BrickOwlClientConfiguration._instance is null)
                 {
                     BrickOwlClientConfiguration._instance = new BrickOwlClientConfiguration();
                 }

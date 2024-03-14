@@ -43,7 +43,7 @@ namespace BrickOwlSharp.Client
             HttpClient _httpClient = null;
             bool _disposeHttpClient = false;
             
-            if (httpClient == null)
+            if (httpClient is null)
             {
                 _httpClient = new HttpClient();
                 _disposeHttpClient = true;

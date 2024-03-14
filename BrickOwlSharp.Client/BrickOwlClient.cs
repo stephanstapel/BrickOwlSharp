@@ -286,7 +286,7 @@ namespace BrickOwlSharp.Client
 
         private static string AppendOptionalParam(string url, string key, object value)
         {
-            if (value == null)
+            if (value is null)
             {
                 return url;
             }
