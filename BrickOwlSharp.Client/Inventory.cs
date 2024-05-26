@@ -87,8 +87,8 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("reserve_uid"), JsonConverter(typeof(IntStringConverter))]
         public int? ReserveUid { get; set; }
 
-        [JsonPropertyName("type")]
-        public string Type{ get; set; }
+        [JsonPropertyName("type"), JsonConverter(typeof(ItemTypeStringConverter))]
+        public ItemType Type { get; set; }
 
         [JsonPropertyName("tier_price"), JsonConverter(typeof(TierPriceListConverter))]
         public List<TierPrice> TierPrices { get; set; }

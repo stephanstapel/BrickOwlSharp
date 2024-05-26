@@ -44,21 +44,19 @@ namespace BrickOwlSharp.Demos
                 Quantity = 1,
                 Price = 1000.15m // make sure nobody will ever buy it :)
             });
-
-            /*
+            
             bool updateResult = await client.UpdateInventoryAsync(new UpdateInventory()
             {
-                LotId = 107931517,
+                LotId = newInventoryResult.LotId.Value,
                 AbsoluteQuantity = 23                
             });            
-            */
 
             foreach (Inventory inventory in await client.GetInventoryAsync())
             {
-                Console.WriteLine($"{inventory.Id}: quantity {inventory.Quantity}, lot id: {inventory.LotId}");
+                Console.WriteLine($"{inventory.Id}: quantity {inventory.Quantity}, lot id: {inventory.LotId}, type: {inventory.Type}");
             }
 
-            bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = 107931627 });
+            bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = newInventoryResult.LotId.Value });
         }
     }
 }
