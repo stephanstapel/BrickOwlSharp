@@ -96,7 +96,7 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("ids")]
         public List<Reference> Ids { get; set; } = new List<Reference>(); 
         
-        [JsonPropertyName("external_lot_ids")]
+        [JsonPropertyName("external_lot_ids"), JsonConverter(typeof(ExternalLotIdConverter))]
         public List<Reference> ExternalLotIds { get; set; } = new List<Reference>();
     }
 }
