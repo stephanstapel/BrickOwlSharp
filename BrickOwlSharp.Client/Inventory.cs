@@ -94,6 +94,9 @@ namespace BrickOwlSharp.Client
         public List<TierPrice> TierPrices { get; set; }
 
         [JsonPropertyName("ids")]
-        public List<Reference> Ids { get; set; } = new List<Reference>();
+        public List<Reference> Ids { get; set; } = new List<Reference>(); 
+        
+        [JsonPropertyName("external_lot_ids")]
+        public List<Reference> ExternalLotIds { get; set; } = new List<Reference>();
     }
 }

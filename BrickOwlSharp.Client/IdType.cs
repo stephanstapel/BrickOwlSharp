@@ -24,6 +24,7 @@
 # endregion
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace BrickOwlSharp.Client
@@ -38,7 +39,8 @@ namespace BrickOwlSharp.Client
         SetNumber,
         BLItemNo,
         UPC,
-        EAN
+        EAN,
+        Other
     }
 
 
@@ -56,9 +58,9 @@ namespace BrickOwlSharp.Client
                 case "bl_item_no": return IdType.BLItemNo;
                 case "ean": return IdType.EAN;
                 case "upc": return IdType.UPC;
+                case "other": return IdType.Other;
+                default: return IdType.Unknown;
             }
-
-            return IdType.Unknown;
         } // !FromString()
 
 
@@ -73,10 +75,10 @@ namespace BrickOwlSharp.Client
                 case IdType.SetNumber: return "set_number";
                 case IdType.BLItemNo: return "bl_item_no";
                 case IdType.EAN: return "ean";
-                case IdType.UPC: return "upc";
+                case IdType.UPC:return "upc";
+                case IdType.Other: return "other";
+                default: return "";
             }
-
-            return "";
         } // !EnumToString()
     }
 }
