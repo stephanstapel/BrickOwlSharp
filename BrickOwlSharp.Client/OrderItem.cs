@@ -63,6 +63,9 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("ordered_quantity"), JsonConverter(typeof(IntStringConverter))]
         public int OrderedQuantity { get; set; }
 
+        [JsonPropertyName("refunded_quantity"), JsonConverter(typeof(IntStringConverter))]
+        public int RefundedQuantity { get; set; }
+
         [JsonPropertyName("personal_note")]
         public string PersonalNote { get; set; }
 
@@ -72,8 +75,8 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("bl_lot_id"), JsonConverter(typeof(IntStringConverter))]
         public int BlLotId { get; set; }
 
-        /** @todo external_lot_ids
-         */
+        [JsonPropertyName("ids")]
+        public List<CatalogItemId> Ids { get; set; }
 
         [JsonPropertyName("remaining_quantity"), JsonConverter(typeof(IntStringConverter))]
         public int RemainingQuantity { get; set; }
@@ -86,5 +89,8 @@ namespace BrickOwlSharp.Client
 
         [JsonPropertyName("base_price"), JsonConverter(typeof(DecimalStringConverter))]
         public decimal BasePrice { get; set; }
+
+        [JsonPropertyName("external_lot_ids"), JsonConverter(typeof(ExternalLotIdConverter))]
+        public List<Reference> ExternalLotIds { get; set; } = new List<Reference>();
     }
 }
