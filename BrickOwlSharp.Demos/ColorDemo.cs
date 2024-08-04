@@ -23,31 +23,25 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-using BrickOwlSharp.Demos;
+using Spectre.Console;
 
-internal static class Program
+internal class ColorDemo
 {
-    static async Task<int> Main()
+    internal async Task RunAsync()
     {
-        BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+        IBrickOwlClient client = BrickOwlClientFactory.Build();
+        List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsyn();
 
-        /*
-        WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        */
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Name");
+        table.AddColumn("Hex");
 
-        
-        InventoryDemo demo = new InventoryDemo();
-        await demo.RunAsync();
+        foreach (BrickOwlSharp.Client.Color color in allColors) 
+        {
+            table.AddRow(color.Id, color.Name, color.Hex);
+        }
 
-        /*
-        CatalogDemo catalogDemo = new CatalogDemo();
-        catalogDemo.Run();
-        */
-
-        ColorDemo colorDemo = new ColorDemo();
-        await colorDemo.RunAsync();
-
-        return 0;
+        AnsiConsole.Write(table);
     }
 }

@@ -22,32 +22,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client;
-using BrickOwlSharp.Demos;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json.Serialization;
 
-internal static class Program
+namespace BrickOwlSharp.Client
 {
-    static async Task<int> Main()
+    public class LegoColor
     {
-        BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+        [JsonPropertyName("lego_id")]
+        public string LegoId { get; set; }
 
-        /*
-        WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        */
-
-        
-        InventoryDemo demo = new InventoryDemo();
-        await demo.RunAsync();
-
-        /*
-        CatalogDemo catalogDemo = new CatalogDemo();
-        catalogDemo.Run();
-        */
-
-        ColorDemo colorDemo = new ColorDemo();
-        await colorDemo.RunAsync();
-
-        return 0;
+        [JsonPropertyName("raw_name")]
+        public string RawName { get; set; }
     }
 }

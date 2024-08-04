@@ -22,32 +22,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client;
-using BrickOwlSharp.Demos;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json.Serialization;
 
-internal static class Program
+namespace BrickOwlSharp.Client
 {
-    static async Task<int> Main()
+    public class Color
     {
-        BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
 
-        /*
-        WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        */
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
 
-        
-        InventoryDemo demo = new InventoryDemo();
-        await demo.RunAsync();
+        [JsonPropertyName("hex")]
+        public string Hex { get; set; }
 
-        /*
-        CatalogDemo catalogDemo = new CatalogDemo();
-        catalogDemo.Run();
-        */
+        [JsonPropertyName("peeron_names")]
+        public List<string> PeeronNames { get; set; }
 
-        ColorDemo colorDemo = new ColorDemo();
-        await colorDemo.RunAsync();
+        [JsonPropertyName("ldraw_ids")]
+        public List<string> LdrawIds { get; set; }
 
-        return 0;
+        [JsonPropertyName("bl_ids")]
+        public List<string> BlIds { get; set; }
+
+        [JsonPropertyName("bl_names")]
+        public List<string> BlNames { get; set; }
+
+        [JsonPropertyName("lego_colors")]
+        public List<LegoColor> LegoColors { get; set; }
     }
 }

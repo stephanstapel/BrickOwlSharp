@@ -53,5 +53,7 @@ namespace BrickOwlSharp.Client
         Task<bool> DeleteInventoryAsync(
            DeleteInventory deleteInventory,
            CancellationToken cancellationToken = default);
+
+        Task<List<Color>> GetColorListAsyn(CancellationToken cancellationToken = default);
     }       
 }

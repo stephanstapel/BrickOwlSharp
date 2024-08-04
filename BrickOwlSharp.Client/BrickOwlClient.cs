@@ -25,10 +25,12 @@
 using BrickOwlSharp.Client.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -208,7 +210,7 @@ namespace BrickOwlSharp.Client
             CatalogItemIds result = await ExecuteGet<CatalogItemIds>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result.BOIDs;
-        }
+        } // !CatalogIdLookupAsync()
 
 
         public async Task<NewInventoryResult> CreateInventoryAsync(
@@ -226,7 +228,7 @@ namespace BrickOwlSharp.Client
             NewInventoryResult result = await ExecutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Inventory, cancellationToken);
             return result;
-        }        
+        } // !CreateInventoryAsync()    
 
 
         public async Task<bool> UpdateInventoryAsync(
@@ -239,7 +241,7 @@ namespace BrickOwlSharp.Client
             BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Inventory, cancellationToken);
             return (result?.Status == "success");
-        }
+        } // !UpdateInventoryAsync()
 
 
         public async Task<List<Inventory>> GetInventoryAsync(
@@ -275,6 +277,17 @@ namespace BrickOwlSharp.Client
             _measureRequest(ResourceType.Inventory, cancellationToken);
             return (result?.Status == "success");
         } // !GetInventoryAsync()
+
+
+        public async Task<List<Color>> GetColorListAsyn(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/color_list").ToString();
+
+            Dictionary<string, Color> result = await ExecuteGet<Dictionary<string, Color>>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result.Values.ToList();
+        } // !GetColorListAsyn()
+
 
 
         private static string AppendApiKey(string url)

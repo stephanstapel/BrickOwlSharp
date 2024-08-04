@@ -23,8 +23,10 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +38,8 @@ namespace BrickOwlSharp.Demos
         internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
+
+            /*
 
             NewInventoryResult newInventoryResult = await client.CreateInventoryAsync(new NewInventory()
             {
@@ -51,12 +55,22 @@ namespace BrickOwlSharp.Demos
                 AbsoluteQuantity = 23                
             });            
 
+            */
+
+            var table = new Table();
+            table.AddColumn("Id");
+            table.AddColumn("Lot Id");
+            table.AddColumn("Quantity");
+            table.AddColumn("Type");
+
             foreach (Inventory inventory in await client.GetInventoryAsync())
             {
-                Console.WriteLine($"{inventory.Id}: quantity {inventory.Quantity}, lot id: {inventory.LotId}, type: {inventory.Type}");
+                table.AddRow(inventory.Id, inventory.LotId.HasValue ? inventory.LotId.Value.ToString() : "", inventory.Quantity.HasValue ? inventory.Quantity.Value.ToString() : "", inventory.Type.ToString());
             }
 
-            bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = newInventoryResult.LotId.Value });
+            AnsiConsole.Write(table);
+
+            //        bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = newInventoryResult.LotId.Value });
         }
     }
 }
