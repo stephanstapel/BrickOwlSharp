@@ -24,7 +24,7 @@ With BrickOwlSharp, developers can easily integrate BrickOwl into their applicat
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
   </ItemGroup>
 
 </Project>

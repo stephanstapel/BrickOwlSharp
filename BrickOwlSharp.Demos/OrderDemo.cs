@@ -23,32 +23,26 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-using BrickOwlSharp.Demos;
+using Spectre.Console;
 
-internal static class Program
+internal class OrderDemo
 {
-    private static async Task<int> Main()
+
+    internal async Task RunAsync()
     {
-        BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+        IBrickOwlClient client = BrickOwlClientFactory.Build();
+        List<BrickOwlSharp.Client.Order> allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
 
-        /*
-        WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        
-        InventoryDemo demo = new InventoryDemo();
-        await demo.RunAsync();
+        var table = new Table();
+        table.AddColumn("Id");
+        table.AddColumn("Date");
+        table.AddColumn("State");
 
-        CatalogDemo catalogDemo = new CatalogDemo();
-        catalogDemo.Run();        
+        foreach (BrickOwlSharp.Client.Order order in allOrders)
+        {
+            table.AddRow(order.Id.ToString(), order.OrderDate.ToShortDateString(), order.Status);
+        }
 
-        ColorDemo colorDemo = new ColorDemo();
-        await colorDemo.RunAsync();
-
-        */
-
-        OrderDemo orderDemo = new OrderDemo();
-        await orderDemo.RunAsync();
-
-        return 0;
+        AnsiConsole.Write(table);
     }
 }

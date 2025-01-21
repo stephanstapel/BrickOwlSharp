@@ -33,7 +33,13 @@ namespace BrickOwlSharp.Client
 {
     public interface IBrickOwlClient
     {
-        Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken = default);
+        Task<List<Order>> GetOrdersAsync(
+            OrderStatus? orderStatusFilter = null,
+            DateTime? minOrderTime = null,
+            int? limit = null,
+            OrderType? orderType = null,
+            OrderSortType? orderSortType = null,
+            CancellationToken cancellationToken = default);
         Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
         Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
         Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);

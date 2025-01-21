@@ -93,9 +93,47 @@ namespace BrickOwlSharp.Client
 
 
         public async Task<List<Order>> GetOrdersAsync(
+            OrderStatus? orderStatusFilter = null,
+            DateTime? minOrderTime = null,
+            int? limit = null,
+            OrderType? orderType = null,
+            OrderSortType? orderSortType = null,
             CancellationToken cancellationToken = default)
         {
             var url = new Uri(_baseUri, $"order/list").ToString();
+
+            if (orderStatusFilter.HasValue)
+            {
+                url = AppendOptionalParam(url, "status", (int)orderStatusFilter);
+            }
+
+            if (minOrderTime.HasValue)
+            {
+                url = AppendOptionalParam(url, "order_time", ((DateTimeOffset)minOrderTime.Value).ToUnixTimeSeconds());
+            }
+
+            if (limit.HasValue)
+            {
+                url = AppendOptionalParam(url, "limit", limit);
+            }
+
+            if (orderType.HasValue)
+            {
+                if (orderType == OrderType.Placed)
+                {
+                    url = AppendOptionalParam(url, "list_type", "customer");
+                }
+                else if (orderType == OrderType.Received)
+                {
+                    url = AppendOptionalParam(url, "list_type", "store");
+                }
+            }
+
+            if (orderSortType.HasValue)
+            {
+                url = AppendOptionalParam(url, "sort_by", orderSortType.Value.ToString().ToLower());
+            }
+
             List<Order> result = await ExecuteGet<List<Order>>(url, cancellationToken);
             _measureRequest(ResourceType.Order, cancellationToken);
             return result;
@@ -385,7 +423,7 @@ namespace BrickOwlSharp.Client
         } // !ExecutePost()
 
 
-        Dictionary<string, string> _ObjectToFormData(object o, bool addKey = true)
+        private Dictionary<string, string> _ObjectToFormData(object o, bool addKey = true)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
