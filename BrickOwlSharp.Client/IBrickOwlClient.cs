@@ -42,6 +42,7 @@ namespace BrickOwlSharp.Client
             CancellationToken cancellationToken = default);
         Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
         Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
+        Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default);
         Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
         Task<List<CatalogItem>> GetCatalogAsync(CancellationToken cancellationToken = default);
 

@@ -186,6 +186,7 @@ namespace BrickOwlSharp.Client
             }
         } // !UpdateOrderStatusAsync()
 
+
         public async Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default)
         {
         	Dictionary<string, string> formData = new Dictionary<string, string>
@@ -208,6 +209,7 @@ namespace BrickOwlSharp.Client
         		return false;
         	}
         } // !UpdateOrderTrackingAsync()
+
 
         public async Task<List<Wishlist>> GetWishlistsAsync(
            CancellationToken cancellationToken = default)
