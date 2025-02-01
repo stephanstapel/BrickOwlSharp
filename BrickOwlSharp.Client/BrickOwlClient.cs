@@ -186,6 +186,28 @@ namespace BrickOwlSharp.Client
             }
         } // !UpdateOrderStatusAsync()
 
+        public async Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default)
+        {
+        	Dictionary<string, string> formData = new Dictionary<string, string>
+        	{
+        		{ "order_id", orderId.ToString() },
+        		{ "tracking_id", trackingIdOrUrl },
+        		{ "key", BrickOwlClientConfiguration.Instance.ApiKey }
+        	};
+        
+        	var url = new Uri(_baseUri, "order/tracking").ToString();
+        
+        	try
+        	{
+        		BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+        		_measureRequest(ResourceType.Order, cancellationToken);
+        		return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
+        	}
+        	catch
+        	{
+        		return false;
+        	}
+        } // !UpdateOrderTrackingAsync()
 
         public async Task<List<Wishlist>> GetWishlistsAsync(
            CancellationToken cancellationToken = default)
