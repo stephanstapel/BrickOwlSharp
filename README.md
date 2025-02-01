@@ -84,6 +84,12 @@ bool result = await client.UpdateOrderStatusAsync(12345, OrderStatus.Processed);
 
 Please note: If the status you are passing to the function has already been reached or surpassed, false is returned as a result.
 
+You can add tracking to your order using:
+
+```C#
+bool result = await client.UpdateOrderTrackingAsync(12345, "https://mytrackinurl.carrier.com");
+```
+
 ## Catalog
 BrickOwl provides a wide range of endpoints for retrieving various information about its catalog.
 To access these functions, BrickOwl administrators have to grant access, see https://www.brickowl.com/api_docs for more details.
