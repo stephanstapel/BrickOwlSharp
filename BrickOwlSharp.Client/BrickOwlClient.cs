@@ -444,15 +444,17 @@ namespace BrickOwlSharp.Client
 
                 if (hasErrors)
                 {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
-                }
-                else
-                {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
+                    if (!String.IsNullOrEmpty(contentAsString))
+                    {
+                        throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
+                    }
+                    else
+                    {
+                        throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
+                    }                    
                 }
 
-
-                    return responseData;
+                return responseData;
             }
         } // !ExecutePost()
 
