@@ -424,13 +424,14 @@ namespace BrickOwlSharp.Client
                     throw new HttpRequestException($"Could not execute request for url {url}");
                 }
 
+                bool hasErrors = false;
                 try
                 { 
                     response.EnsureSuccessStatusCode();
                 }
                 catch
                 {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}");
+                    hasErrors = true;
                 }
 
                 var contentAsString = await response.Content.ReadAsStringAsync();
@@ -438,11 +439,20 @@ namespace BrickOwlSharp.Client
 
                 if (responseData == null)
                 {
-                    //TODO 
-                    throw new Exception("");
+                    throw new HttpRequestException($"Invalid response for url {url} with form data {JsonSerializer.Serialize(formData)}.");
                 }
 
-                return responseData;
+                if (hasErrors)
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
+                }
+                else
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
+                }
+
+
+                    return responseData;
             }
         } // !ExecutePost()
 
