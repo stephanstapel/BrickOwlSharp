@@ -302,7 +302,7 @@ namespace BrickOwlSharp.Client
             var url = new Uri(_baseUri, $"inventory/update").ToString();
             BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Inventory, cancellationToken);
-            return (result?.Status == "success");
+            return result.Status?.Equals("success", StringComparison.OrdinalIgnoreCase) == true;
         } // !UpdateInventoryAsync()
 
 
