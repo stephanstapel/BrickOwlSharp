@@ -37,19 +37,17 @@ internal static class Program
         
         InventoryDemo demo = new InventoryDemo();
         await demo.RunAsync();
-        */
 
         CatalogDemo catalogDemo = new();
         await catalogDemo.RunAsync();        
         
-        /*
         ColorDemo colorDemo = new ColorDemo();
         await colorDemo.RunAsync();
+        
+        */
 
         OrderDemo orderDemo = new OrderDemo();
         await orderDemo.RunAsync();
-
-        */
 
         return 0;
     }

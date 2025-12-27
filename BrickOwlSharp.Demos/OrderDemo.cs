@@ -31,6 +31,9 @@ internal class OrderDemo
     internal async Task RunAsync()
     {
         IBrickOwlClient client = BrickOwlClientFactory.Build();
+
+        var result = await client.LeaveFeedbackAsync(0, FeedbackRating.Positive, "Great buyer, fast payment!");
+
         List<BrickOwlSharp.Client.Order> allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
 
         var table = new Table();

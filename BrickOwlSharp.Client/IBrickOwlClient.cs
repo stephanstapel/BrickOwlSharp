@@ -71,5 +71,7 @@ namespace BrickOwlSharp.Client
         /// <param name="cancellationToken"></param>
         /// <returns>Inventory items included in the item</returns>
         public Task<List<ItemInventoryItem>> GetItemInventoryAsync(string boid, CancellationToken cancellationToken = default);
+
+        public Task<bool> LeaveFeedbackAsync(int orderId , FeedbackRating rating, string comment = null, CancellationToken cancellationToken = default);
     }       
 }

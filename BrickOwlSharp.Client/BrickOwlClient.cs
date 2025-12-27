@@ -22,13 +22,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -36,6 +36,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using BrickOwlSharp.Client.Json;
 
 namespace BrickOwlSharp.Client
 {
@@ -361,6 +362,37 @@ namespace BrickOwlSharp.Client
             return result?.Items;
         } // !GetItemInventoryAsync()
 
+
+        public async Task<bool> LeaveFeedbackAsync(int orderId, FeedbackRating rating, string comment = null, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "order_id", orderId.ToString() },
+                { "rating", ((int)rating).ToString() },
+                { "comment", comment },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, $"order/feedback").ToString();
+
+            try
+            {
+                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+                _measureRequest(ResourceType.Order, cancellationToken);
+                if (string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        } // !LeaveFeedbackAsync()
 
 
         private static string AppendApiKey(string url)
