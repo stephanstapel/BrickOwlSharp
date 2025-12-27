@@ -46,7 +46,7 @@ namespace BrickOwlSharp.Client
         private readonly bool _disposeHttpClient;
 
         private bool _isDisposed;
-        private IBrickOwlRequestHandler _requestHandler;
+        private readonly IBrickOwlRequestHandler _requestHandler;
 
         public BrickOwlClient(HttpClient httpClient,
             bool disposeHttpClient,
@@ -351,6 +351,17 @@ namespace BrickOwlSharp.Client
         } // !GetColorListAsyn()
 
 
+        public async Task<List<ItemInventoryItem>> GetItemInventoryAsync(string boid, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, $"catalog/inventory").ToString();
+            url = AppendOptionalParam(url, "boid", boid);
+
+            ItemInventoryItemCollection result = await ExecuteGet<ItemInventoryItemCollection>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result?.Items;
+        } // !GetItemInventoryAsync()
+
+
 
         private static string AppendApiKey(string url)
         {
@@ -378,84 +389,67 @@ namespace BrickOwlSharp.Client
         {
             var urlWithKey = AppendApiKey(url);
 
-            using (var message = new HttpRequestMessage(HttpMethod.Get, urlWithKey))
+            using var message = new HttpRequestMessage(HttpMethod.Get, urlWithKey);
+
+            message.Content = null;
+            var response = await _httpClient.SendAsync(message, cancellationToken);
+
+            try
             {
+                response.EnsureSuccessStatusCode();
+            }
+            catch
+            {
+                throw new HttpRequestException($"Received status code {response.StatusCode} for url {url}");
+            }
 
-                message.Content = null;
-                var response = await _httpClient.SendAsync(message, cancellationToken);
-                
-                try
-                {
-                    response.EnsureSuccessStatusCode();
-                }
-                catch
-                {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url}");
-                }
-
-                var contentAsString = await response.Content.ReadAsStringAsync();
-                var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString);
-
-                if (responseData == null)
-                {
-                    //TODO 
-                    throw new Exception("");
-                }
-
-                return responseData;
-            }            
+            var contentAsString = await response.Content.ReadAsStringAsync();
+            var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString) ?? throw new Exception("");
+            return responseData;
         } // !ExecuteGet()
           
 
         private async Task<TResponse> ExecutePost<TResponse>(string url, Dictionary<string, string> formData, CancellationToken cancellationToken = default)
-        {            
-            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Post, url);
+            HttpContent content = new FormUrlEncodedContent(formData);
+            HttpResponseMessage response = null;
+            try
             {
-                HttpContent content = new FormUrlEncodedContent(formData);
-                HttpResponseMessage response = null;
-                try
-                {
-                    Task< HttpResponseMessage> responseTask = _httpClient.PostAsync(url, content, cancellationToken);
-                    responseTask.Wait();
-                    response = responseTask.Result;
-                }
-                catch (Exception ex)
-                {
-                    throw new HttpRequestException($"Could not execute request for url {url}");
-                }
-
-                bool hasErrors = false;
-                try
-                { 
-                    response.EnsureSuccessStatusCode();
-                }
-                catch
-                {
-                    hasErrors = true;
-                }
-
-                var contentAsString = await response.Content.ReadAsStringAsync();
-                var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString);
-
-                if (responseData == null)
-                {
-                    throw new HttpRequestException($"Invalid response for url {url} with form data {JsonSerializer.Serialize(formData)}.");
-                }
-
-                if (hasErrors)
-                {
-                    if (!String.IsNullOrEmpty(contentAsString))
-                    {
-                        throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
-                    }
-                    else
-                    {
-                        throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
-                    }                    
-                }
-
-                return responseData;
+                Task<HttpResponseMessage> responseTask = _httpClient.PostAsync(url, content, cancellationToken);
+                responseTask.Wait();
+                response = responseTask.Result;
             }
+            catch
+            {
+                throw new HttpRequestException($"Could not execute request for url {url}");
+            }
+
+            bool hasErrors = false;
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch
+            {
+                hasErrors = true;
+            }
+
+            var contentAsString = await response.Content.ReadAsStringAsync();
+            var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString) ?? throw new HttpRequestException($"Invalid response for url {url} with form data {JsonSerializer.Serialize(formData)}.");
+            if (hasErrors)
+            {
+                if (!String.IsNullOrEmpty(contentAsString))
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
+                }
+                else
+                {
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
+                }
+            }
+
+            return responseData;
         } // !ExecutePost()
 
 
@@ -493,9 +487,9 @@ namespace BrickOwlSharp.Client
                 }
                 else if (String.IsNullOrEmpty(converterName) && (rawValue != null))
                 {
-                    if (rawValue is decimal)
+                    if (rawValue is decimal v)
                     {
-                        value = ((decimal)rawValue).ToString(CultureInfo.InvariantCulture);
+                        value = v.ToString(CultureInfo.InvariantCulture);
                     }
                     else
                     {
@@ -520,11 +514,12 @@ namespace BrickOwlSharp.Client
 
         private async void _measureRequest(ResourceType resourceType, CancellationToken cancellationToken = default)
         {
-            if (this._requestHandler != null)
+            if (this._requestHandler == null)
             {
-                CancellationTokenSource source = new CancellationTokenSource();
-                await this._requestHandler.OnRequestAsync(resourceType, cancellationToken);
+                return;
             }
+
+            await this._requestHandler.OnRequestAsync(resourceType, cancellationToken);
         }
     }
 }

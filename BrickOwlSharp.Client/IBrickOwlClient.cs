@@ -33,34 +33,43 @@ namespace BrickOwlSharp.Client
 {
     public interface IBrickOwlClient
     {
-        Task<List<Order>> GetOrdersAsync(
+        public Task<List<Order>> GetOrdersAsync(
             OrderStatus? orderStatusFilter = null,
             DateTime? minOrderTime = null,
             int? limit = null,
             OrderType? orderType = null,
             OrderSortType? orderSortType = null,
             CancellationToken cancellationToken = default);
-        Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
-        Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
-        Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default);
-        Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
-        Task<List<CatalogItem>> GetCatalogAsync(CancellationToken cancellationToken = default);
+        public Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default);
+        public Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
+        public Task<List<CatalogItem>> GetCatalogAsync(CancellationToken cancellationToken = default);
 
-        Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default);
-        Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default);
-        Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default);
-        Task<NewInventoryResult> CreateInventoryAsync(NewInventory newInventory, CancellationToken cancellationToken = default);
-        Task<bool> UpdateInventoryAsync(
+        public Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default);
+        public Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default);
+        public Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default);
+        public Task<NewInventoryResult> CreateInventoryAsync(NewInventory newInventory, CancellationToken cancellationToken = default);
+        public Task<bool> UpdateInventoryAsync(
             UpdateInventory updatedInventory,
             CancellationToken cancellationToken = default);
-        Task<List<Inventory>> GetInventoryAsync(
+        public Task<List<Inventory>> GetInventoryAsync(
             string filter = null, bool? activeOnly = null, string externalId = null, int? lotId = null,
             CancellationToken cancellationToken = default);
 
-        Task<bool> DeleteInventoryAsync(
+        public Task<bool> DeleteInventoryAsync(
            DeleteInventory deleteInventory,
            CancellationToken cancellationToken = default);
 
-        Task<List<Color>> GetColorListAsyn(CancellationToken cancellationToken = default);
+        public Task<List<Color>> GetColorListAsyn(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Returns the item inventory for a given BOID. If you are passing the BOID of a set, the response
+        /// will include all parts inside that set.
+        /// </summary>
+        /// <param name="boid">BOID of the item, e.g. the set</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Inventory items included in the item</returns>
+        public Task<List<ItemInventoryItem>> GetItemInventoryAsync(string boid, CancellationToken cancellationToken = default);
     }       
 }

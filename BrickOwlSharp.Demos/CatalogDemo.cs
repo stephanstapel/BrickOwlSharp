@@ -29,33 +29,28 @@ namespace BrickOwlSharp.Demos
 {
     internal class CatalogDemo
     {
-        internal void Run()
+        internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
+
+            var itemInventoryItems = await client.GetItemInventoryAsync("1067768"); // WAll-E and Eve
            
             // lookup a single design id
-            Task<List<string>> boids = client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
-            boids.Wait();
-
+            List<string> boids = await client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
+            
             // retrieve item availability
-            Task<Dictionary<string, CatalogItemAvailability>> availability = client.CatalogAvailabilityAsync("737117-39", "DE");
-            availability.Wait();            
+            Dictionary<string, CatalogItemAvailability> availability = await client.CatalogAvailabilityAsync("737117-39", "DE");
 
             // retrieve a single catalog item
-            Task<CatalogItem> item = client.CatalogLookupAsync("737117-39");
-            item.Wait();            
-          
+            CatalogItem item = await client.CatalogLookupAsync("737117-39");
+            
             // retrieve the entire catalog
-            Task<List<CatalogItem>> catalog = client.GetCatalogAsync();
-            catalog.Wait();
+            List<CatalogItem> catalog = await client.GetCatalogAsync();
 
-            foreach(CatalogItem catalogItem in catalog.Result) 
+            foreach(CatalogItem catalogItem in catalog) 
             {
                 Console.WriteLine($"{catalogItem.Id}: {catalogItem.Name}");
             }
-            
-
-            Task.WaitAll();          
-        }
+        } // !RunAsync()
     }
 }
