@@ -37,7 +37,7 @@ namespace BrickOwlSharp.Client
     /// </summary>
     /// <example>
     /// <code>
-    /// BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+    /// BrickOwlClientConfiguration.Instance.ApiKey = "<your api key>";
     ///
     /// IBrickOwlClient client = BrickOwlClientFactory.Build();
     /// List&lt;Order&gt; allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
