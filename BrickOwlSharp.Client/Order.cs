@@ -50,10 +50,7 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("base_order_total"), JsonConverter(typeof(DecimalStringConverter))]
         public decimal BaseOrderTotal { get; set; }
 
-        [JsonPropertyName("status")]
-        public string Status { get; set; }
-
-        [JsonPropertyName("status_id"), JsonConverter(typeof(IntStringConverter))]
-        public int StatusId { get; set; }
+        [JsonPropertyName("status_id"), JsonConverter(typeof(OrderStatusStringConverter))]
+        public OrderStatus Status { get; set; }
     }
 }
