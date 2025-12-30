@@ -23,8 +23,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-using System.Linq;
-using System.Text.Json;
 
 namespace BrickOwlSharp.Demos
 {
@@ -46,8 +44,8 @@ namespace BrickOwlSharp.Demos
             Console.WriteLine($"Order {orderDetails.Id} has {orderDetails.Items.Count} items.");
 
             // Sample: retrieve tax scheme metadata.
-            JsonElement taxSchemes = await client.GetOrderTaxSchemesAsync();
-            Console.WriteLine($"Tax scheme payload has properties: {taxSchemes.EnumerateObject().Count()}");
+            OrderTaxSchemesResponse taxSchemes = await client.GetOrderTaxSchemesAsync();
+            Console.WriteLine($"Tax scheme payload has properties: {taxSchemes.AdditionalData.Count}");
 
             // Toggle write samples to avoid accidental mutations.
             bool runOrderUpdates = false;

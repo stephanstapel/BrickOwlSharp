@@ -23,8 +23,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-using System.Linq;
-using System.Text.Json;
+using System.Collections.Generic;
 
 namespace BrickOwlSharp.Demos
 {
@@ -41,34 +40,51 @@ namespace BrickOwlSharp.Demos
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: bulk download metadata for catalog updates.
-            JsonElement bulkCatalog = await client.CatalogBulkAsync("catalog");
-            Console.WriteLine($"Bulk catalog payload has properties: {bulkCatalog.EnumerateObject().Count()}");
+            CatalogBulkResponse bulkCatalog = await client.CatalogBulkAsync("catalog");
+            Console.WriteLine($"Bulk catalog payload has properties: {bulkCatalog.AdditionalData.Count}");
 
             // Sample: bulk lookup for a list of BOIDs.
-            JsonElement bulkLookup = await client.CatalogBulkLookupAsync(new[] { "737117-39", "1067768" });
-            Console.WriteLine($"Bulk lookup payload has properties: {bulkLookup.EnumerateObject().Count()}");
+            CatalogBulkLookupResponse bulkLookup = await client.CatalogBulkLookupAsync(new[] { "737117-39", "1067768" });
+            Console.WriteLine($"Bulk lookup payload has properties: {bulkLookup.AdditionalData.Count}");
 
             // Sample: catalog search for a query.
-            JsonElement searchResults = await client.CatalogSearchAsync("Brick", page: 1);
-            Console.WriteLine($"Catalog search payload has properties: {searchResults.EnumerateObject().Count()}");
+            CatalogSearchResponse searchResults = await client.CatalogSearchAsync("Brick", page: 1);
+            Console.WriteLine($"Catalog search payload has properties: {searchResults.AdditionalData.Count}");
 
             // Sample: list catalog conditions.
-            JsonElement conditions = await client.GetCatalogConditionListAsync();
-            Console.WriteLine($"Catalog conditions payload has properties: {conditions.EnumerateObject().Count()}");
+            CatalogConditionListResponse conditions = await client.GetCatalogConditionListAsync();
+            Console.WriteLine($"Catalog conditions payload has properties: {conditions.AdditionalData.Count}");
 
             // Sample: list field options for a catalog attribute.
-            JsonElement fieldOptions = await client.GetCatalogFieldOptionListAsync("category_0", "en");
-            Console.WriteLine($"Catalog field options payload has properties: {fieldOptions.EnumerateObject().Count()}");
+            CatalogFieldOptionListResponse fieldOptions = await client.GetCatalogFieldOptionListAsync("category_0", "en");
+            Console.WriteLine($"Catalog field options payload has properties: {fieldOptions.AdditionalData.Count}");
 
             // Sample: create a basic catalog cart for pricing.
-            string itemsJson = "{\"items\":[{\"design_id\":\"3034\",\"color_id\":21,\"qty\":\"1\"}]}";
-            JsonElement cart = await client.CreateCatalogCartBasicAsync(itemsJson, "N", "US");
-            Console.WriteLine($"Catalog cart payload has properties: {cart.EnumerateObject().Count()}");
+            var cartItems = new (string DesignId, int? ColorId, string Boid, int Quantity)[]
+            {
+                ("3034", 21, null, 1)
+            };
+            CatalogCartBasicResponse cart = await client.CreateCatalogCartBasicAsync(
+                cartItems,
+                "N",
+                "US");
+            Console.WriteLine($"Catalog cart returned {cart.Items.Count} items.");
 
             // Sample: batch multiple requests into a single API call.
-            string batchJson = "{\"requests\":[{\"endpoint\":\"catalog/search\",\"request_method\":\"GET\",\"params\":[{\"query\":\"Vendor\"}]}]}";
-            JsonElement batchResponse = await client.BulkBatchAsync(batchJson);
-            Console.WriteLine($"Batch response payload has properties: {batchResponse.EnumerateObject().Count()}");
+            var batchRequests = new (string Endpoint, string RequestMethod, IEnumerable<Dictionary<string, string>> Parameters)[]
+            {
+                ("catalog/search",
+                    "GET",
+                    new List<Dictionary<string, string>>
+                    {
+                        new Dictionary<string, string>
+                        {
+                            { "query", "Vendor" }
+                        }
+                    })
+            };
+            BulkBatchResponse batchResponse = await client.BulkBatchAsync(batchRequests);
+            Console.WriteLine($"Batch response contained {batchResponse.Responses.Count} responses.");
         }
     }
 }

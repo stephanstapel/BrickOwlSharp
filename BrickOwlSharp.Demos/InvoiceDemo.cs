@@ -23,8 +23,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-using System.Linq;
-using System.Text.Json;
 
 namespace BrickOwlSharp.Demos
 {
@@ -41,8 +39,8 @@ namespace BrickOwlSharp.Demos
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: retrieve invoice transactions by a public invoice ID.
-            JsonElement transactions = await client.GetInvoiceTransactionsAsync("INV-000000", "public_invoice_id");
-            Console.WriteLine($"Invoice transactions payload has properties: {transactions.EnumerateObject().Count()}");
+            InvoiceTransactionsResponse transactions = await client.GetInvoiceTransactionsAsync("INV-000000", "public_invoice_id");
+            Console.WriteLine($"Invoice transactions payload has properties: {transactions.AdditionalData.Count}");
         }
     }
 }
