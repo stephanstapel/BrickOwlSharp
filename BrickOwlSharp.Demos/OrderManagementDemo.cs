@@ -41,7 +41,7 @@ namespace BrickOwlSharp.Demos
             // Sample: retrieve a single order with full details.
             const int sampleOrderId = 0;
             OrderDetails orderDetails = await client.GetOrderAsync(sampleOrderId);
-            Console.WriteLine($"Order {orderDetails.Id} has {orderDetails.Items.Count} items.");
+            Console.WriteLine($"Order {orderDetails.Id} has {orderDetails.OrderItems.Count} items.");
 
             // Sample: retrieve tax scheme metadata.
             OrderTaxSchemesResponse taxSchemes = await client.GetOrderTaxSchemesAsync();
@@ -55,7 +55,7 @@ namespace BrickOwlSharp.Demos
                 bool noteUpdated = await client.UpdateOrderNoteAsync(sampleOrderId, "Packed and ready to ship.");
                 Console.WriteLine($"Order note updated: {noteUpdated}");
 
-                bool statusUpdated = await client.UpdateOrderStatusAsync(sampleOrderId, OrderStatus.Packed);
+                bool statusUpdated = await client.UpdateOrderStatusAsync(sampleOrderId, OrderStatus.Processed);
                 Console.WriteLine($"Order status updated: {statusUpdated}");
 
                 bool trackingUpdated = await client.UpdateOrderTrackingAsync(sampleOrderId, "TRACKING-123");

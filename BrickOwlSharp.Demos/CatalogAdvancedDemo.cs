@@ -60,7 +60,7 @@ namespace BrickOwlSharp.Demos
             Console.WriteLine($"Catalog field options payload has properties: {fieldOptions.AdditionalData.Count}");
 
             // Sample: create a basic catalog cart for pricing.
-            var cartItems = new (string DesignId, int? ColorId, string Boid, int Quantity)[]
+            var cartItems = new (string DesignId, int? ColorId, string? Boid, int Quantity)[]
             {
                 ("3034", 21, null, 1)
             };

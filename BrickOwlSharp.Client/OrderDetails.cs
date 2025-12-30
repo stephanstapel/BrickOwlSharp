@@ -35,7 +35,7 @@ namespace BrickOwlSharp.Client
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         [JsonPropertyName("order_id"), JsonConverter(typeof(IntStringConverter))]
-        public int OrderId { get; set; }
+        public int Id { get; set; }
 
         [JsonPropertyName("order_time"), JsonConverter(typeof(DateTimeStringConverter))]
         public DateTime OrderTime { get; set; }
