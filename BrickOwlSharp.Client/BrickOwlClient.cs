@@ -231,6 +231,83 @@ namespace BrickOwlSharp.Client
             return result;
         }
 
+        public async Task<JsonElement> BulkBatchAsync(string requestsJson, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "requests", requestsJson },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, "bulk/batch").ToString();
+            JsonElement result = await ExecutePost<JsonElement>(url, formData, cancellationToken: cancellationToken);
+            _measureRequest(ResourceType.Unknown, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> CatalogBulkAsync(string type, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "catalog/bulk").ToString();
+            url = AppendOptionalParam(url, "type", type);
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> CatalogBulkLookupAsync(IEnumerable<string> boids, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "catalog/bulk_lookup").ToString();
+            url = AppendOptionalParam(url, "boids", string.Join(",", boids ?? Enumerable.Empty<string>()));
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> CatalogSearchAsync(string query, int? page = null, string missingData = null, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "catalog/search").ToString();
+            url = AppendOptionalParam(url, "query", query);
+            url = AppendOptionalParam(url, "page", page);
+            url = AppendOptionalParam(url, "missing_data", missingData);
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> GetCatalogConditionListAsync(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "catalog/condition_list").ToString();
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> GetCatalogFieldOptionListAsync(string type, string language = null, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "catalog/field_option_list").ToString();
+            url = AppendOptionalParam(url, "type", type);
+            url = AppendOptionalParam(url, "language", language);
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> CreateCatalogCartBasicAsync(string itemsJson, string condition, string country, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "items", itemsJson },
+                { "condition", condition },
+                { "country", country },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, "catalog/cart_basic").ToString();
+            JsonElement result = await ExecutePost<JsonElement>(url, formData, cancellationToken: cancellationToken);
+            _measureRequest(ResourceType.Catalog, cancellationToken);
+            return result;
+        }
+
 
         public async Task<Dictionary<string,CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default)
         {
@@ -361,6 +438,93 @@ namespace BrickOwlSharp.Client
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result?.Items;
         } // !GetItemInventoryAsync()
+
+        public async Task<bool> UpdateOrderNoteAsync(int orderId, string note, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "order_id", orderId.ToString() },
+                { "note", note },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, "order/note").ToString();
+
+            try
+            {
+                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+                _measureRequest(ResourceType.Order, cancellationToken);
+                return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<JsonElement> GetOrderTaxSchemesAsync(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "order/tax_schemes").ToString();
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Order, cancellationToken);
+            return result;
+        }
+
+        public async Task<bool> SetOrderNotifyAsync(string ipAddress, CancellationToken cancellationToken = default)
+        {
+            Dictionary<string, string> formData = new Dictionary<string, string>()
+            {
+                { "ip", ipAddress },
+                { "key", BrickOwlClientConfiguration.Instance.ApiKey }
+            };
+
+            var url = new Uri(_baseUri, "order/notify").ToString();
+
+            try
+            {
+                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
+                _measureRequest(ResourceType.Order, cancellationToken);
+                return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<JsonElement> GetUserDetailsAsync(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "user/details").ToString();
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Unknown, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> GetUserAddressesAsync(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "user/addresses").ToString();
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Unknown, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> GetTokenDetailsAsync(CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "token/details").ToString();
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Unknown, cancellationToken);
+            return result;
+        }
+
+        public async Task<JsonElement> GetInvoiceTransactionsAsync(string invoiceId, string idType, CancellationToken cancellationToken = default)
+        {
+            var url = new Uri(_baseUri, "invoice/transactions").ToString();
+            url = AppendOptionalParam(url, "invoice_id", invoiceId);
+            url = AppendOptionalParam(url, "id_type", idType);
+            JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
+            _measureRequest(ResourceType.Unknown, cancellationToken);
+            return result;
+        }
 
 
         public async Task<bool> LeaveFeedbackAsync(int orderId, FeedbackRating rating, string comment = null, CancellationToken cancellationToken = default)
