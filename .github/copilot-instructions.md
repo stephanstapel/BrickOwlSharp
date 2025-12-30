@@ -54,45 +54,35 @@ You act as an experienced **senior C# developer**. Prioritize **readability**, *
 ```csharp
 namespace MyLib.Services;
 
-public sealed class GooglePlacesService : IDisposable
+public class MyClass : BaseClass
 {
-    private readonly GooglePlacesSettings _Settings;
+    private MemberClass _Settings;
     private readonly HttpClient _Http;
     private readonly JsonSerializerOptions _JsonSerializerOptions;
 
-    public GooglePlacesService(GooglePlacesSettings settings, HttpClient http)
+
+    public ReturnClass Query(string query)
     {
-        _Settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _Http = http ?? throw new ArgumentNullException(nameof(http));
-        _JsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-    } // !GooglePlacesService()
+        Task<ReturnClass> t = QueryAsync(query);
+        return t.GetAwaiter().GetResult();
+    } // !Query()
 
-    public async Task<GooglePlacesResult> QueryAsync(string query, CancellationToken cancellationToken = default)
+
+    public async Task<ReturnClass> QueryAsync(string query)
     {
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            throw new ArgumentException("Query must not be empty.", nameof(query));
-        }
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, BuildUri(query));
-        using var response = await _Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        var result = await JsonSerializer.DeserializeAsync<GooglePlacesResult>(stream, _JsonSerializerOptions, cancellationToken).ConfigureAwait(false);
-        return result ?? new GooglePlacesResult();
+        return await QueryAsync(query);
     } // !QueryAsync()
 
-    private Uri BuildUri(string query)
+    
+    private void _Initialize()
     {
-        // Build a URI using _Settings and query
-        return new Uri("https://example.com"); 
-    } // !BuildUri()
-
-    public void Dispose()
-    {
-        // If you do not own _Http, do not dispose it here.
-    } // !Dispose()
+        _Http = new HttpClient();
+        _JsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+    } // !_Initialize()
 }
 
 
@@ -102,6 +92,7 @@ public sealed class GooglePlacesService : IDisposable
 * Add unit tests for public behavior; use MSUnit, FluentAssertions (optional).
 * Use CancellationToken on async APIs.
 * Keep exceptions meaningful and specific; do not swallow exceptions silently.
+* If you are asked to improve the existing code, respond with an actionable list of steps that can easily be followed. Start with the most effectful improvements. Propose concrete improvements in form of code or comments.
 
 ### Don’t
 * Don’t block on async (.Result, GetAwaiter().GetResult()).
