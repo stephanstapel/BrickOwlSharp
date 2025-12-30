@@ -321,26 +321,26 @@ namespace BrickOwlSharp.Client
             CancellationToken cancellationToken = default)
         {
             var itemList = new List<Dictionary<string, string>>();
-            foreach (var item in items ?? Enumerable.Empty<(string DesignId, int? ColorId, string Boid, int Quantity)>())
+            foreach (var (designId, colorId, boid, quantity) in items ?? Enumerable.Empty<(string DesignId, int? ColorId, string Boid, int Quantity)>())
             {
                 var itemDictionary = new Dictionary<string, string>
                 {
-                    { "qty", item.Quantity.ToString() }
+                    { "qty", quantity.ToString() }
                 };
 
-                if (!string.IsNullOrWhiteSpace(item.DesignId))
+                if (!string.IsNullOrWhiteSpace(designId))
                 {
-                    itemDictionary["design_id"] = item.DesignId;
+                    itemDictionary["design_id"] = designId;
                 }
 
-                if (item.ColorId.HasValue)
+                if (colorId.HasValue)
                 {
-                    itemDictionary["color_id"] = item.ColorId.Value.ToString();
+                    itemDictionary["color_id"] = colorId.Value.ToString();
                 }
 
-                if (!string.IsNullOrWhiteSpace(item.Boid))
+                if (!string.IsNullOrWhiteSpace(boid))
                 {
-                    itemDictionary["boid"] = item.Boid;
+                    itemDictionary["boid"] = boid;
                 }
 
                 itemList.Add(itemDictionary);
