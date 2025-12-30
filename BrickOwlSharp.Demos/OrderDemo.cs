@@ -58,7 +58,7 @@ internal class OrderDemo
 
         foreach (BrickOwlSharp.Client.Order order in allOrders)
         {
-            table.AddRow(order.Id.ToString(), order.OrderDate.ToShortDateString(), order.Status);
+            table.AddRow(order.Id.ToString(), order.OrderDate.ToShortDateString(), order.Status.ToString());
         }
 
         AnsiConsole.Write(table);

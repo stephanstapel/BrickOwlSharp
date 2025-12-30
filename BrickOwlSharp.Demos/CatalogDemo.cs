@@ -40,7 +40,7 @@ namespace BrickOwlSharp.Demos
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: fetch inventory items for a catalog item (Wall-E and Eve).
-            List<ItemInventory> itemInventoryItems = await client.GetItemInventoryAsync("1067768");
+            List<ItemInventoryItem> itemInventoryItems = await client.GetItemInventoryAsync("1067768");
             Console.WriteLine($"Item inventory items: {itemInventoryItems.Count}");
            
             // Sample: lookup a single design id.
