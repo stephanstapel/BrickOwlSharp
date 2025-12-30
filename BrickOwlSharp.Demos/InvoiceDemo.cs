@@ -23,29 +23,26 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-
+using System.Linq;
+using System.Text.Json;
 
 namespace BrickOwlSharp.Demos
 {
     /// <summary>
-    /// Demonstrates wishlist endpoints with read-only sample cases.
+    /// Demonstrates invoice transaction retrieval endpoints.
     /// </summary>
-    internal class WishlistDemo
+    internal class InvoiceDemo
     {
         /// <summary>
-        /// Runs wishlist samples against the BrickOwl API.
+        /// Runs invoice samples against the BrickOwl API.
         /// </summary>
         internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
-            // Sample: list wishlists for the authenticated user.
-            List<Wishlist> wishlists = await client.GetWishlistsAsync();
-
-            foreach(Wishlist wishlist in wishlists) 
-            {
-                Console.WriteLine($"{wishlist.Id}: {wishlist.Name}");
-            }
+            // Sample: retrieve invoice transactions by a public invoice ID.
+            JsonElement transactions = await client.GetInvoiceTransactionsAsync("INV-000000", "public_invoice_id");
+            Console.WriteLine($"Invoice transactions payload has properties: {transactions.EnumerateObject().Count()}");
         }
     }
 }

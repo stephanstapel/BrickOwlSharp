@@ -23,29 +23,34 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
 using BrickOwlSharp.Client;
-
+using System.Linq;
+using System.Text.Json;
 
 namespace BrickOwlSharp.Demos
 {
     /// <summary>
-    /// Demonstrates wishlist endpoints with read-only sample cases.
+    /// Demonstrates user and token detail endpoints.
     /// </summary>
-    internal class WishlistDemo
+    internal class UserDemo
     {
         /// <summary>
-        /// Runs wishlist samples against the BrickOwl API.
+        /// Runs user detail samples against the BrickOwl API.
         /// </summary>
         internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
-            // Sample: list wishlists for the authenticated user.
-            List<Wishlist> wishlists = await client.GetWishlistsAsync();
+            // Sample: retrieve user account details.
+            JsonElement userDetails = await client.GetUserDetailsAsync();
+            Console.WriteLine($"User details payload has properties: {userDetails.EnumerateObject().Count()}");
 
-            foreach(Wishlist wishlist in wishlists) 
-            {
-                Console.WriteLine($"{wishlist.Id}: {wishlist.Name}");
-            }
+            // Sample: retrieve user addresses.
+            JsonElement userAddresses = await client.GetUserAddressesAsync();
+            Console.WriteLine($"User addresses payload has properties: {userAddresses.EnumerateObject().Count()}");
+
+            // Sample: retrieve deprecated token details.
+            JsonElement tokenDetails = await client.GetTokenDetailsAsync();
+            Console.WriteLine($"Token details payload has properties: {tokenDetails.EnumerateObject().Count()}");
         }
     }
 }

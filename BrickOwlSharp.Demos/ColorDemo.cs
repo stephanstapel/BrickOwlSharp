@@ -25,11 +25,19 @@
 using BrickOwlSharp.Client;
 using Spectre.Console;
 
+/// <summary>
+/// Demonstrates color list endpoint usage.
+/// </summary>
 internal class ColorDemo
 {
+    /// <summary>
+    /// Runs color samples against the BrickOwl API.
+    /// </summary>
     internal async Task RunAsync()
     {
         IBrickOwlClient client = BrickOwlClientFactory.Build();
+
+        // Sample: list all colors.
         List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsyn();
 
         var table = new Table();
