@@ -22,33 +22,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 # endregion
-using BrickOwlSharp.Client;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace BrickOwlSharp.Demos
+namespace BrickOwlSharp.Client
 {
-    /// <summary>
-    /// Demonstrates user and token detail endpoints.
-    /// </summary>
-    internal class UserDemo
+    public class UserDetailsResponse
     {
-        /// <summary>
-        /// Runs user detail samples against the BrickOwl API.
-        /// </summary>
-        internal async Task RunAsync()
-        {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
-
-            // Sample: retrieve user account details.
-            UserDetailsResponse userDetails = await client.GetUserDetailsAsync();
-            Console.WriteLine($"User details payload has properties: {userDetails.AdditionalData.Count}");
-
-            // Sample: retrieve user addresses.
-            UserAddressesResponse userAddresses = await client.GetUserAddressesAsync();
-            Console.WriteLine($"User addresses payload has properties: {userAddresses.AdditionalData.Count}");
-
-            // Sample: retrieve deprecated token details.
-            TokenDetailsResponse tokenDetails = await client.GetTokenDetailsAsync();
-            Console.WriteLine($"Token details payload has properties: {tokenDetails.AdditionalData.Count}");
-        }
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> AdditionalData { get; set; } = new Dictionary<string, JsonElement>();
     }
 }
