@@ -44,7 +44,7 @@ namespace BrickOwlSharp.Demos
             Console.WriteLine($"Bulk catalog payload has properties: {bulkCatalog.AdditionalData.Count}");
 
             // Sample: bulk lookup for a list of BOIDs.
-            CatalogBulkLookupResponse bulkLookup = await client.CatalogBulkLookupAsync(new[] { "737117-39", "1067768" });
+            CatalogBulkLookupResponse bulkLookup = await client.CatalogBulkLookupAsync(["737117-39", "1067768"]);
             Console.WriteLine($"Bulk lookup payload has properties: {bulkLookup.AdditionalData.Count}");
 
             // Sample: catalog search for a query.
@@ -77,8 +77,7 @@ namespace BrickOwlSharp.Demos
                     "GET",
                     new List<Dictionary<string, string>>
                     {
-                        new Dictionary<string, string>
-                        {
+                        new() {
                             { "query", "Vendor" }
                         }
                     })
