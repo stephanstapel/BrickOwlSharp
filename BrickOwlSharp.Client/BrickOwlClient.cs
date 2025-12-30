@@ -729,6 +729,6 @@ namespace BrickOwlSharp.Client
             }
 
             await this._requestHandler.OnRequestAsync(resourceType, cancellationToken);
-        }
+        } // !_measureRequest()
     }
 }
