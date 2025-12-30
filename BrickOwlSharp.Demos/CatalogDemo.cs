@@ -27,24 +27,35 @@ using BrickOwlSharp.Client;
 
 namespace BrickOwlSharp.Demos
 {
+    /// <summary>
+    /// Demonstrates catalog endpoints and lookup samples.
+    /// </summary>
     internal class CatalogDemo
     {
+        /// <summary>
+        /// Runs catalog samples against the BrickOwl API.
+        /// </summary>
         internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
-            var itemInventoryItems = await client.GetItemInventoryAsync("1067768"); // WAll-E and Eve
+            // Sample: fetch inventory items for a catalog item (Wall-E and Eve).
+            List<ItemInventory> itemInventoryItems = await client.GetItemInventoryAsync("1067768");
+            Console.WriteLine($"Item inventory items: {itemInventoryItems.Count}");
            
-            // lookup a single design id
+            // Sample: lookup a single design id.
             List<string> boids = await client.CatalogIdLookupAsync("3005", ItemType.Part, IdType.DesignId); // brick 1x1
+            Console.WriteLine($"Catalog ID lookup results: {string.Join(", ", boids)}");
             
-            // retrieve item availability
+            // Sample: retrieve item availability for a region.
             Dictionary<string, CatalogItemAvailability> availability = await client.CatalogAvailabilityAsync("737117-39", "DE");
+            Console.WriteLine($"Availability entries: {availability.Count}");
 
-            // retrieve a single catalog item
+            // Sample: retrieve a single catalog item.
             CatalogItem item = await client.CatalogLookupAsync("737117-39");
+            Console.WriteLine($"Catalog item: {item.Id} - {item.Name}");
             
-            // retrieve the entire catalog
+            // Sample: retrieve the entire catalog.
             List<CatalogItem> catalog = await client.GetCatalogAsync();
 
             foreach(CatalogItem catalogItem in catalog) 

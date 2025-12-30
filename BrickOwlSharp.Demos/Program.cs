@@ -33,17 +33,29 @@ internal static class Program
 
         /*
         WishlistDemo demo = new WishlistDemo();
-        demo.Run();
-        
+        await demo.RunAsync();
+
         InventoryDemo demo = new InventoryDemo();
         await demo.RunAsync();
 
         CatalogDemo catalogDemo = new();
-        await catalogDemo.RunAsync();        
-        
+        await catalogDemo.RunAsync();
+
         ColorDemo colorDemo = new ColorDemo();
         await colorDemo.RunAsync();
-        
+
+        CatalogAdvancedDemo catalogAdvancedDemo = new CatalogAdvancedDemo();
+        await catalogAdvancedDemo.RunAsync();
+
+        OrderManagementDemo orderManagementDemo = new OrderManagementDemo();
+        await orderManagementDemo.RunAsync();
+
+        UserDemo userDemo = new UserDemo();
+        await userDemo.RunAsync();
+
+        InvoiceDemo invoiceDemo = new InvoiceDemo();
+        await invoiceDemo.RunAsync();
+
         */
 
         OrderDemo orderDemo = new OrderDemo();

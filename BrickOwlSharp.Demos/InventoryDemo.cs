@@ -33,29 +33,49 @@ using System.Threading.Tasks;
 
 namespace BrickOwlSharp.Demos
 {
+    /// <summary>
+    /// Demonstrates inventory endpoints with read and write sample cases.
+    /// </summary>
     internal class InventoryDemo
     {
+        /// <summary>
+        /// Runs inventory samples against the BrickOwl API.
+        /// </summary>
         internal async Task RunAsync()
         {
             IBrickOwlClient client = BrickOwlClientFactory.Build();
 
-            /*
+            // Toggle write samples to avoid accidental mutations.
+            bool runWriteSamples = false;
 
-            NewInventoryResult newInventoryResult = await client.CreateInventoryAsync(new NewInventory()
+            if (runWriteSamples)
             {
-                Id = "414759", // Bracket 1 x 2 - 1 x 2 Inverted
-                Condition = Condition.New,
-                Quantity = 1,
-                Price = 1000.15m // make sure nobody will ever buy it :)
-            });
-            
-            bool updateResult = await client.UpdateInventoryAsync(new UpdateInventory()
-            {
-                LotId = newInventoryResult.LotId.Value,
-                AbsoluteQuantity = 23                
-            });            
+                // Sample: create a new inventory lot.
+                NewInventoryResult newInventoryResult = await client.CreateInventoryAsync(new NewInventory()
+                {
+                    Id = "414759", // Bracket 1 x 2 - 1 x 2 Inverted
+                    Condition = Condition.New,
+                    Quantity = 1,
+                    Price = 1000.15m // make sure nobody will ever buy it :)
+                });
 
-            */
+                // Sample: update the inventory lot created above.
+                bool updateResult = await client.UpdateInventoryAsync(new UpdateInventory()
+                {
+                    LotId = newInventoryResult.LotId!.Value,
+                    AbsoluteQuantity = 23
+                });
+
+                Console.WriteLine($"Inventory update result: {updateResult}");
+
+                // Sample: delete the inventory lot created above.
+                bool deleteResult = await client.DeleteInventoryAsync(new DeleteInventory()
+                {
+                    LotId = newInventoryResult.LotId.Value
+                });
+
+                Console.WriteLine($"Inventory delete result: {deleteResult}");
+            }
 
             var table = new Table();
             table.AddColumn("Id");
@@ -63,14 +83,13 @@ namespace BrickOwlSharp.Demos
             table.AddColumn("Quantity");
             table.AddColumn("Type");
 
+            // Sample: list all inventory lots.
             foreach (Inventory inventory in await client.GetInventoryAsync())
             {
                 table.AddRow(inventory.Id, inventory.LotId.HasValue ? inventory.LotId.Value.ToString() : "", inventory.Quantity.HasValue ? inventory.Quantity.Value.ToString() : "", inventory.Type.ToString());
             }
 
             AnsiConsole.Write(table);
-
-            //        bool result = await client.DeleteInventoryAsync(new DeleteInventory() { LotId = newInventoryResult.LotId.Value });
         }
     }
 }

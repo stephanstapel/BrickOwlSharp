@@ -25,15 +25,30 @@
 using BrickOwlSharp.Client;
 using Spectre.Console;
 
+/// <summary>
+/// Demonstrates order endpoints with sample read and feedback calls.
+/// </summary>
 internal class OrderDemo
 {
 
+    /// <summary>
+    /// Runs order samples against the BrickOwl API.
+    /// </summary>
     internal async Task RunAsync()
     {
         IBrickOwlClient client = BrickOwlClientFactory.Build();
 
-        var result = await client.LeaveFeedbackAsync(0, FeedbackRating.Positive, "Great buyer, fast payment!");
+        // Toggle feedback samples to avoid accidental feedback submissions.
+        bool runFeedbackSample = false;
 
+        if (runFeedbackSample)
+        {
+            // Sample: leave feedback for an order.
+            bool result = await client.LeaveFeedbackAsync(0, FeedbackRating.Positive, "Great buyer, fast payment!");
+            Console.WriteLine($"Feedback submitted: {result}");
+        }
+
+        // Sample: list orders sorted by updated date.
         List<BrickOwlSharp.Client.Order> allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
 
         var table = new Table();
