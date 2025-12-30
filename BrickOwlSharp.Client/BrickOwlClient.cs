@@ -58,10 +58,12 @@ namespace BrickOwlSharp.Client
             _requestHandler = requestHandler;
         }
 
+
         ~BrickOwlClient()
         {
             Dispose(false);
         }
+
 
         private static JsonSerializerOptions IgnoreNullValuesJsonSerializerOptions
         {
@@ -90,7 +92,7 @@ namespace BrickOwlSharp.Client
             }
 
             _isDisposed = true;
-        }
+        } // !Dispose()
 
 
         public async Task<List<Order>> GetOrdersAsync(
@@ -219,7 +221,7 @@ namespace BrickOwlSharp.Client
             List<Wishlist> result = await ExecuteGet<List<Wishlist>>(url, cancellationToken);
             _measureRequest(ResourceType.Wishlist, cancellationToken);
             return result;
-        }
+        } // !GetWishlistsAsync()
 
 
         public async Task<List<CatalogItem>> GetCatalogAsync(
@@ -229,7 +231,8 @@ namespace BrickOwlSharp.Client
             List<CatalogItem> result = await ExecuteGet<List<CatalogItem>>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !GetCatalogAsync()
+
 
         public async Task<JsonElement> BulkBatchAsync(string requestsJson, CancellationToken cancellationToken = default)
         {
@@ -243,7 +246,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecutePost<JsonElement>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
-        }
+        } // !BulkBatchAsync()
+
 
         public async Task<JsonElement> CatalogBulkAsync(string type, CancellationToken cancellationToken = default)
         {
@@ -252,7 +256,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CatalogBulkAsync()
+
 
         public async Task<JsonElement> CatalogBulkLookupAsync(IEnumerable<string> boids, CancellationToken cancellationToken = default)
         {
@@ -261,7 +266,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CatalogBulkLookupAsync()
+
 
         public async Task<JsonElement> CatalogSearchAsync(string query, int? page = null, string missingData = null, CancellationToken cancellationToken = default)
         {
@@ -272,7 +278,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CatalogSearchAsync()
+
 
         public async Task<JsonElement> GetCatalogConditionListAsync(CancellationToken cancellationToken = default)
         {
@@ -280,7 +287,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !GetCatalogConditionListAsync()
+
 
         public async Task<JsonElement> GetCatalogFieldOptionListAsync(string type, string language = null, CancellationToken cancellationToken = default)
         {
@@ -290,7 +298,7 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !GetCatalogFieldOptionListAsync()
 
         public async Task<JsonElement> CreateCatalogCartBasicAsync(string itemsJson, string condition, string country, CancellationToken cancellationToken = default)
         {
@@ -306,7 +314,7 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecutePost<JsonElement>(url, formData, cancellationToken: cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CreateCatalogCartBasicAsync()
 
 
         public async Task<Dictionary<string,CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default)
@@ -323,7 +331,7 @@ namespace BrickOwlSharp.Client
             Dictionary<string, CatalogItemAvailability> result = await ExecuteGet<Dictionary<string, CatalogItemAvailability>>(url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CatalogAvailabilityAsync()
 
 
         public async Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default)
@@ -333,7 +341,7 @@ namespace BrickOwlSharp.Client
             CatalogItem result = await ExecuteGet<CatalogItem> (url, cancellationToken);
             _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
-        }
+        } // !CatalogLookupAsync()
 
 
         public async Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default)
@@ -460,7 +468,8 @@ namespace BrickOwlSharp.Client
             {
                 return false;
             }
-        }
+        } // !UpdateOrderNoteAsync()
+
 
         public async Task<JsonElement> GetOrderTaxSchemesAsync(CancellationToken cancellationToken = default)
         {
@@ -468,7 +477,7 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Order, cancellationToken);
             return result;
-        }
+        } // !GetOrderTaxSchemesAsync()
 
         public async Task<bool> SetOrderNotifyAsync(string ipAddress, CancellationToken cancellationToken = default)
         {
@@ -490,7 +499,8 @@ namespace BrickOwlSharp.Client
             {
                 return false;
             }
-        }
+        }  // !SetOrderNotifyAsync()
+
 
         public async Task<JsonElement> GetUserDetailsAsync(CancellationToken cancellationToken = default)
         {
@@ -498,7 +508,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
-        }
+        } // !GetUserDetailsAsync()
+
 
         public async Task<JsonElement> GetUserAddressesAsync(CancellationToken cancellationToken = default)
         {
@@ -506,7 +517,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
-        }
+        } // !GetUserAddressesAsync()
+
 
         public async Task<JsonElement> GetTokenDetailsAsync(CancellationToken cancellationToken = default)
         {
@@ -514,7 +526,8 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
-        }
+        } // !GetTokenDetailsAsync()
+
 
         public async Task<JsonElement> GetInvoiceTransactionsAsync(string invoiceId, string idType, CancellationToken cancellationToken = default)
         {
@@ -524,7 +537,7 @@ namespace BrickOwlSharp.Client
             JsonElement result = await ExecuteGet<JsonElement>(url, cancellationToken);
             _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
-        }
+        } // !GetInvoiceTransactionsAsync()
 
 
         public async Task<bool> LeaveFeedbackAsync(int orderId, FeedbackRating rating, string comment = null, CancellationToken cancellationToken = default)
