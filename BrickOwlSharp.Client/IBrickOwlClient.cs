@@ -32,6 +32,17 @@ using System.Threading.Tasks;
 
 namespace BrickOwlSharp.Client
 {
+    /// <summary>
+    /// Client abstraction for interacting with the BrickOwl API.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// BrickOwlClientConfiguration.Instance.ApiKey = System.IO.File.ReadAllText("apikey.txt");
+    ///
+    /// IBrickOwlClient client = BrickOwlClientFactory.Build();
+    /// List&lt;Order&gt; allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
+    /// </code>
+    /// </example>
     public interface IBrickOwlClient
     {
         /// <summary>
@@ -42,7 +53,7 @@ namespace BrickOwlSharp.Client
         /// <param name="limit">Optional limit for the number of orders returned.</param>
         /// <param name="orderType">Optional order list type (store vs customer).</param>
         /// <param name="orderSortType">Optional sort order.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of orders.</returns>
         public Task<List<Order>> GetOrdersAsync(
             OrderStatus? orderStatusFilter = null,
@@ -56,7 +67,7 @@ namespace BrickOwlSharp.Client
         /// Retrieve full order details, including items.
         /// </summary>
         /// <param name="orderId">Order ID.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Order details and item list.</returns>
         public Task<OrderDetails> GetOrderAsync(int orderId, CancellationToken cancellationToken = default);
 
@@ -65,7 +76,7 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="orderId">Order ID.</param>
         /// <param name="status">New status.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the update succeeded.</returns>
         public Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus status, CancellationToken cancellationToken = default);
 
@@ -74,21 +85,21 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="orderId">Order ID.</param>
         /// <param name="trackingIdOrUrl">Tracking ID or URL.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the update succeeded.</returns>
         public Task<bool> UpdateOrderTrackingAsync(int orderId, string trackingIdOrUrl, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve the wishlists available on the account.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of wishlists.</returns>
         public Task<List<Wishlist>> GetWishlistsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve the full catalog list.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of catalog items.</returns>
         public Task<List<CatalogItem>> GetCatalogAsync(CancellationToken cancellationToken = default);
 
@@ -99,7 +110,7 @@ namespace BrickOwlSharp.Client
         /// JSON payload describing the batch requests, for example:
         /// {"requests":[{"endpoint":"catalog/search","request_method":"GET","params":[{"query":"Vendor"}]}]}
         /// </param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> BulkBatchAsync(string requestsJson, CancellationToken cancellationToken = default);
 
@@ -107,7 +118,7 @@ namespace BrickOwlSharp.Client
         /// Retrieve bulk catalog dumps for a specific bulk type.
         /// </summary>
         /// <param name="type">Bulk type identifier.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> CatalogBulkAsync(string type, CancellationToken cancellationToken = default);
 
@@ -115,7 +126,7 @@ namespace BrickOwlSharp.Client
         /// Retrieve details about multiple catalog items at once.
         /// </summary>
         /// <param name="boids">A comma-separated list of BOIDs (maximum 100).</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> CatalogBulkLookupAsync(IEnumerable<string> boids, CancellationToken cancellationToken = default);
 
@@ -125,14 +136,14 @@ namespace BrickOwlSharp.Client
         /// <param name="query">Search term (use "All" to browse).</param>
         /// <param name="page">Optional page number.</param>
         /// <param name="missingData">Optional missing data filter.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> CatalogSearchAsync(string query, int? page = null, string missingData = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve a list of lot conditions supported by the catalog.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetCatalogConditionListAsync(CancellationToken cancellationToken = default);
 
@@ -141,7 +152,7 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="type">Catalog field type (e.g. category_0, eye_color).</param>
         /// <param name="language">Optional language code.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetCatalogFieldOptionListAsync(string type, string language = null, CancellationToken cancellationToken = default);
 
@@ -153,7 +164,7 @@ namespace BrickOwlSharp.Client
         /// </param>
         /// <param name="condition">Minimum condition code for items.</param>
         /// <param name="country">2-letter destination country code.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> CreateCatalogCartBasicAsync(string itemsJson, string condition, string country, CancellationToken cancellationToken = default);
 
@@ -163,7 +174,7 @@ namespace BrickOwlSharp.Client
         /// <param name="boid">BOID of the item.</param>
         /// <param name="country">2-letter destination country code.</param>
         /// <param name="quantity">Optional minimum quantity.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Availability information keyed by store ID.</returns>
         public Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default);
 
@@ -171,7 +182,7 @@ namespace BrickOwlSharp.Client
         /// Retrieve catalog details for a single BOID.
         /// </summary>
         /// <param name="boid">BOID of the item.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Catalog item details.</returns>
         public Task<CatalogItem> CatalogLookupAsync(string boid, CancellationToken cancellationToken = default);
 
@@ -181,7 +192,7 @@ namespace BrickOwlSharp.Client
         /// <param name="boid">External ID value.</param>
         /// <param name="type">Item type filter.</param>
         /// <param name="idType">Optional ID type filter.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of matching BOIDs.</returns>
         public Task<List<string>> CatalogIdLookupAsync(string boid, ItemType type, IdType? idType = null, CancellationToken cancellationToken = default);
 
@@ -189,7 +200,7 @@ namespace BrickOwlSharp.Client
         /// Create a new lot in store inventory.
         /// </summary>
         /// <param name="newInventory">New inventory details.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Result containing the new lot ID.</returns>
         public Task<NewInventoryResult> CreateInventoryAsync(NewInventory newInventory, CancellationToken cancellationToken = default);
 
@@ -197,7 +208,7 @@ namespace BrickOwlSharp.Client
         /// Update an existing inventory lot.
         /// </summary>
         /// <param name="updatedInventory">Inventory update payload.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the update succeeded.</returns>
         public Task<bool> UpdateInventoryAsync(
             UpdateInventory updatedInventory,
@@ -210,7 +221,7 @@ namespace BrickOwlSharp.Client
         /// <param name="activeOnly">Optional active-only flag.</param>
         /// <param name="externalId">Optional external ID filter.</param>
         /// <param name="lotId">Optional lot ID filter.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of inventory lots.</returns>
         public Task<List<Inventory>> GetInventoryAsync(
             string filter = null, bool? activeOnly = null, string externalId = null, int? lotId = null,
@@ -220,7 +231,7 @@ namespace BrickOwlSharp.Client
         /// Delete an inventory lot.
         /// </summary>
         /// <param name="deleteInventory">Deletion payload.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the deletion succeeded.</returns>
         public Task<bool> DeleteInventoryAsync(
            DeleteInventory deleteInventory,
@@ -229,7 +240,7 @@ namespace BrickOwlSharp.Client
         /// <summary>
         /// Retrieve the catalog color list.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of colors.</returns>
         public Task<List<Color>> GetColorListAsyn(CancellationToken cancellationToken = default);
 
@@ -238,7 +249,7 @@ namespace BrickOwlSharp.Client
         /// will include all parts inside that set.
         /// </summary>
         /// <param name="boid">BOID of the item, e.g. the set</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Inventory items included in the item</returns>
         public Task<List<ItemInventoryItem>> GetItemInventoryAsync(string boid, CancellationToken cancellationToken = default);
 
@@ -247,14 +258,14 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="orderId">Order ID.</param>
         /// <param name="note">Seller note text.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the update succeeded.</returns>
         public Task<bool> UpdateOrderNoteAsync(int orderId, string note, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve tax schemes that can be applied to orders.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetOrderTaxSchemesAsync(CancellationToken cancellationToken = default);
 
@@ -264,28 +275,28 @@ namespace BrickOwlSharp.Client
         /// <param name="ipAddress">
         /// IP address to notify. Pass an empty string to remove the notification.
         /// </param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the update succeeded.</returns>
         public Task<bool> SetOrderNotifyAsync(string ipAddress, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve details for the user associated with the API key.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetUserDetailsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve the addresses associated with the user account.
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetUserAddressesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve details for the API key owner (deprecated endpoint).
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetTokenDetailsAsync(CancellationToken cancellationToken = default);
 
@@ -294,7 +305,7 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="invoiceId">Invoice identifier.</param>
         /// <param name="idType">Invoice ID type (e.g. public_invoice_id or stripe_charge_id).</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Raw JSON response from the API.</returns>
         public Task<JsonElement> GetInvoiceTransactionsAsync(string invoiceId, string idType, CancellationToken cancellationToken = default);
 
@@ -304,7 +315,7 @@ namespace BrickOwlSharp.Client
         /// <param name="orderId">Order ID.</param>
         /// <param name="rating">Feedback rating.</param>
         /// <param name="comment">Optional feedback comment.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>True if the feedback was accepted.</returns>
         public Task<bool> LeaveFeedbackAsync(int orderId , FeedbackRating rating, string comment = null, CancellationToken cancellationToken = default);
     }       
