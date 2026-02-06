@@ -47,7 +47,7 @@ namespace BrickOwlSharp.Client
         [JsonPropertyName("relative_quantity")]
         public int? RelativeQuantity { get; set; }
 
-        [JsonPropertyName("for_sale")]
+        [JsonPropertyName("for_sale"), JsonConverter(typeof(BoolStringConverter))]
         public bool? ForSale { get; set; }
 
         [JsonPropertyName("price")]
