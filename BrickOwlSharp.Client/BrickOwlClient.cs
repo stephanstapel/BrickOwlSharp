@@ -366,7 +366,7 @@ namespace BrickOwlSharp.Client
         } // !CreateCatalogCartBasicAsync()
 
 
-        public async Task<Dictionary<string,CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default)
+        public async Task<Dictionary<string,CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, string storeCountry = null, CancellationToken cancellationToken = default)
         {
             var url = new Uri(_baseUri, $"catalog/availability").ToString();
             url = AppendOptionalParam(url, "boid", boid);
@@ -375,6 +375,11 @@ namespace BrickOwlSharp.Client
             if (quantity.HasValue)
             {
                 url = AppendOptionalParam(url, "quantity", quantity.ToString());
+            }
+
+            if (!String.IsNullOrWhiteSpace(storeCountry))
+            {
+                url = AppendOptionalParam(url, "store_country", storeCountry);
             }
 
             Dictionary<string, CatalogItemAvailability> result = await ExecuteGet<Dictionary<string, CatalogItemAvailability>>(url, cancellationToken);
