@@ -177,9 +177,10 @@ namespace BrickOwlSharp.Client
         /// <param name="boid">BOID of the item.</param>
         /// <param name="country">2-letter destination country code.</param>
         /// <param name="quantity">Optional minimum quantity.</param>
+        /// <param name="storeCountry">Optional store country code.</param>
         /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>Availability information keyed by store ID.</returns>
-        public Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, CancellationToken cancellationToken = default);
+        public Task<Dictionary<string, CatalogItemAvailability>> CatalogAvailabilityAsync(string boid, string country, int? quantity = null, string storeCountry = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieve catalog details for a single BOID.
