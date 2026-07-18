@@ -244,4 +244,18 @@ public class BrickOwlClientApiKeyTests
 
         Assert.Contains("external_id=3f9a2b7c-1d4e-4a5b-9c6d-7e8f9a0b1c2d", handler.CapturedBody);
     }
+
+    [Fact]
+    public async Task UpdateInventoryAsync_UpdateExternalIdSet_SendsUpdateExternalIdStringInBody()
+    {
+        // ExternalId/LotId identify which lot the update targets; UpdateExternalId carries the
+        // new external_id value to write onto that lot - it's a value field, not a boolean flag,
+        // so it needs the same string type as ExternalId/NewInventory.ExternalId.
+        BrickOwlClientConfiguration.Instance.ApiKey = "test-key";
+        var (client, handler) = BuildClient("{\"status\":\"success\"}");
+
+        await client.UpdateInventoryAsync(new UpdateInventory { UpdateExternalId = "3f9a2b7c-1d4e-4a5b-9c6d-7e8f9a0b1c2d" });
+
+        Assert.Contains("update_external_id_1=3f9a2b7c-1d4e-4a5b-9c6d-7e8f9a0b1c2d", handler.CapturedBody);
+    }
 }

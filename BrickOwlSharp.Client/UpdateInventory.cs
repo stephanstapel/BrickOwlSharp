@@ -75,7 +75,7 @@ namespace BrickOwlSharp.Client
         public Condition? Condition { get; set; }
 
         [JsonPropertyName("update_external_id_1")]
-        public int? UpdateExternalId { get; set; }
+        public string UpdateExternalId { get; set; }
 
     }
 }
