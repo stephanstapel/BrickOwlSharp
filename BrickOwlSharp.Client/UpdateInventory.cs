@@ -36,7 +36,7 @@ namespace BrickOwlSharp.Client
     public class UpdateInventory
     {
         [JsonPropertyName("external_id")]
-        public int? ExternalId { get; set; }
+        public string ExternalId { get; set; }
 
         [JsonPropertyName("lot_id")]
         public int? LotId { get; set; }
