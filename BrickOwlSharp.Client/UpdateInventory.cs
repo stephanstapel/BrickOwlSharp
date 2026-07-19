@@ -36,7 +36,7 @@ namespace BrickOwlSharp.Client
     public class UpdateInventory
     {
         [JsonPropertyName("external_id")]
-        public int? ExternalId { get; set; }
+        public string ExternalId { get; set; }
 
         [JsonPropertyName("lot_id")]
         public int? LotId { get; set; }
@@ -75,7 +75,7 @@ namespace BrickOwlSharp.Client
         public Condition? Condition { get; set; }
 
         [JsonPropertyName("update_external_id_1")]
-        public int? UpdateExternalId { get; set; }
+        public string UpdateExternalId { get; set; }
 
     }
 }
