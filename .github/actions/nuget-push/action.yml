@@ -1,0 +1,16 @@
+name: Push to NuGet
+description: Push .nupkg and .snupkg packages from ./nupkgs/ to NuGet
+
+inputs:
+  api-key:
+    description: NuGet API key
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Push packages
+    shell: bash
+    run: |
+      dotnet nuget push ./nupkgs/*.nupkg --api-key "${{ inputs.api-key }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      ls ./nupkgs/*.snupkg &>/dev/null && dotnet nuget push ./nupkgs/*.snupkg --api-key "${{ inputs.api-key }}" --source https://api.nuget.org/v3/index.json --skip-duplicate || true

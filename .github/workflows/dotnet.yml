@@ -6,20 +6,57 @@ on:
   pull_request:
     branches: [ "main" ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
       run: dotnet restore BrickOwlSharp.sln
     - name: Build
-      run: dotnet build BrickOwlSharp.sln --no-restore
+      run: dotnet build BrickOwlSharp.sln --no-restore -c Release
     - name: Test
-      run: dotnet test BrickOwlSharp.Tests/BrickOwlSharp.Tests.csproj --no-build --verbosity normal
+      run: dotnet test BrickOwlSharp.Tests/BrickOwlSharp.Tests.csproj --no-build -c Release --verbosity normal
+    - name: Pack (pre-release)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        dotnet pack BrickOwlSharp.Client/BrickOwlSharp.Client.csproj \
+          --no-build \
+          -c Release \
+          -p:Version="$(dotnet msbuild BrickOwlSharp.Client/BrickOwlSharp.Client.csproj -getProperty:Version)-preview.${{ github.run_number }}" \
+          -o ./nupkgs
+    - name: Upload prerelease packages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: prerelease-packages
+        path: ./nupkgs/
+        retention-days: 1
+
+  publish-prerelease:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - name: Download prerelease packages
+      uses: actions/download-artifact@v4
+      with:
+        name: prerelease-packages
+        path: ./nupkgs/
+    - name: Push to NuGet
+      uses: ./.github/actions/nuget-push
+      with:
+        api-key: ${{ secrets.NUGET_API_KEY }}
