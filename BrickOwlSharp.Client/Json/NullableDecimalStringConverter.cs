@@ -47,7 +47,7 @@ namespace BrickOwlSharp.Client.Json
         {
             if (value.HasValue)
             {
-                var typeString = value.ToString();
+                var typeString = value.Value.ToString(CultureInfo.InvariantCulture);
                 writer.WriteStringValue(typeString);
             }
             else

@@ -37,7 +37,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: bulk download metadata for catalog updates.
             CatalogBulkResponse bulkCatalog = await client.CatalogBulkAsync("catalog");

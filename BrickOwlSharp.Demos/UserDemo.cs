@@ -36,7 +36,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: retrieve user account details.
             UserDetailsResponse userDetails = await client.GetUserDetailsAsync();

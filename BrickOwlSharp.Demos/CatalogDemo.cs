@@ -37,7 +37,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: fetch inventory items for a catalog item (Wall-E and Eve).
             List<ItemInventoryItem> itemInventoryItems = await client.GetItemInventoryAsync("1067768");

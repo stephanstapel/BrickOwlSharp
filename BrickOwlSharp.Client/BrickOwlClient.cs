@@ -24,13 +24,10 @@
 # endregion
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -62,36 +59,16 @@ namespace BrickOwlSharp.Client
         }
 
 
-        ~BrickOwlClient()
-        {
-            Dispose(false);
-        }
-
-
-        private static JsonSerializerOptions IgnoreNullValuesJsonSerializerOptions
-        {
-            get
-            {
-                return new JsonSerializerOptions()
-                {
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-            }
-        }
-
-        private void Dispose(bool disposing)
+        public void Dispose()
         {
             if (_isDisposed)
             {
                 return;
             }
 
-            if (disposing)
+            if (_disposeHttpClient)
             {
-                if (_disposeHttpClient)
-                {
-                    _httpClient.Dispose();
-                }
+                _httpClient.Dispose();
             }
 
             _isDisposed = true;
@@ -144,11 +121,11 @@ namespace BrickOwlSharp.Client
 
             if (orderSortType.HasValue)
             {
-                url = AppendOptionalParam(url, "sort_by", orderSortType.Value.ToString().ToLower());
+                url = AppendOptionalParam(url, "sort_by", orderSortType.Value.ToString().ToLowerInvariant());
             }
 
             List<Order> result = await ExecuteGet<List<Order>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Order, cancellationToken);
+            await _measureRequest(ResourceType.Order, cancellationToken);
             return result;
         } // !GetOrdersAsync()
 
@@ -161,14 +138,14 @@ namespace BrickOwlSharp.Client
             async Task<OrderDetails> FetchDetails()
             {
                 var result = await ExecuteGet<OrderDetails>(detailsUrl, apiKey, cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
+                await _measureRequest(ResourceType.Order, cancellationToken);
                 return result;
             }
 
             async Task<List<OrderItem>> FetchItems()
             {
                 var result = await ExecuteGet<List<OrderItem>>(itemUrl, apiKey, cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
+                await _measureRequest(ResourceType.Order, cancellationToken);
                 return result;
             }
 
@@ -194,23 +171,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"order/set_status").ToString();
 
-            try
-            {
-                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
-                if (string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
+            return await _ExecutePostReturningSuccess(url, formData, ResourceType.Order, cancellationToken);
         } // !UpdateOrderStatusAsync()
 
 
@@ -225,16 +186,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, "order/tracking").ToString();
 
-            try
-            {
-                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
-                return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
+            return await _ExecutePostReturningSuccess(url, formData, ResourceType.Order, cancellationToken);
         } // !UpdateOrderTrackingAsync()
 
 
@@ -244,7 +196,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, $"wishlist/lists").ToString();
             List<Wishlist> result = await ExecuteGet<List<Wishlist>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Wishlist, cancellationToken);
+            await _measureRequest(ResourceType.Wishlist, cancellationToken);
             return result;
         } // !GetWishlistsAsync()
 
@@ -255,7 +207,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, $"catalog/list").ToString();
             List<CatalogItem> result = await ExecuteGet<List<CatalogItem>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !GetCatalogAsync()
 
@@ -285,7 +237,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, "bulk/batch").ToString();
             BulkBatchResponse result = await ExecutePost<BulkBatchResponse>(url, formData, cancellationToken: cancellationToken);
-            _measureRequest(ResourceType.Unknown, cancellationToken);
+            await _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
         } // !BulkBatchAsync()
 
@@ -295,7 +247,7 @@ namespace BrickOwlSharp.Client
             var url = new Uri(_baseUri, "catalog/bulk").ToString();
             url = AppendOptionalParam(url, "type", type);
             CatalogBulkResponse result = await ExecuteGet<CatalogBulkResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CatalogBulkAsync()
 
@@ -305,7 +257,7 @@ namespace BrickOwlSharp.Client
             var url = new Uri(_baseUri, "catalog/bulk_lookup").ToString();
             url = AppendOptionalParam(url, "boids", string.Join(",", boids ?? Enumerable.Empty<string>()));
             CatalogBulkLookupResponse result = await ExecuteGet<CatalogBulkLookupResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CatalogBulkLookupAsync()
 
@@ -317,7 +269,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "page", page);
             url = AppendOptionalParam(url, "missing_data", missingData);
             CatalogSearchResponse result = await ExecuteGet<CatalogSearchResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CatalogSearchAsync()
 
@@ -326,7 +278,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, "catalog/condition_list").ToString();
             CatalogConditionListResponse result = await ExecuteGet<CatalogConditionListResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !GetCatalogConditionListAsync()
 
@@ -337,7 +289,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "type", type);
             url = AppendOptionalParam(url, "language", language);
             CatalogFieldOptionListResponse result = await ExecuteGet<CatalogFieldOptionListResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !GetCatalogFieldOptionListAsync()
 
@@ -389,7 +341,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, "catalog/cart_basic").ToString();
             CatalogCartBasicResponse result = await ExecutePost<CatalogCartBasicResponse>(url, formData, cancellationToken: cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CreateCatalogCartBasicAsync()
 
@@ -411,7 +363,7 @@ namespace BrickOwlSharp.Client
             }
 
             Dictionary<string, CatalogItemAvailability> result = await ExecuteGet<Dictionary<string, CatalogItemAvailability>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CatalogAvailabilityAsync()
 
@@ -421,7 +373,7 @@ namespace BrickOwlSharp.Client
             var url = new Uri(_baseUri, $"catalog/lookup").ToString();
             url = AppendOptionalParam(url, "boid", boid);
             CatalogItem result = await ExecuteGet<CatalogItem>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result;
         } // !CatalogLookupAsync()
 
@@ -438,7 +390,7 @@ namespace BrickOwlSharp.Client
             }
 
             CatalogItemIds result = await ExecuteGet<CatalogItemIds>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result.BOIDs;
         } // !CatalogIdLookupAsync()
 
@@ -457,7 +409,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"inventory/create").ToString();
             NewInventoryResult result = await ExecutePost<NewInventoryResult>(url, formData, cancellationToken: cancellationToken);
-            _measureRequest(ResourceType.Inventory, cancellationToken);
+            await _measureRequest(ResourceType.Inventory, cancellationToken);
             return result;
         } // !CreateInventoryAsync()    
 
@@ -471,7 +423,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"inventory/update").ToString();
             BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-            _measureRequest(ResourceType.Inventory, cancellationToken);
+            await _measureRequest(ResourceType.Inventory, cancellationToken);
             return result.Status?.Equals("success", StringComparison.OrdinalIgnoreCase) == true;
         } // !UpdateInventoryAsync()
 
@@ -494,7 +446,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "lot_id", lotId);
 
             List<Inventory> result = await ExecuteGet<List<Inventory>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Inventory, cancellationToken);
+            await _measureRequest(ResourceType.Inventory, cancellationToken);
             return result;
         } // !GetInventoryAsync()
 
@@ -508,19 +460,25 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"inventory/delete").ToString();
             BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-            _measureRequest(ResourceType.Inventory, cancellationToken);
+            await _measureRequest(ResourceType.Inventory, cancellationToken);
             return (result?.Status == "success");
         } // !GetInventoryAsync()
 
 
-        public async Task<List<Color>> GetColorListAsyn(string apiKey = default, CancellationToken cancellationToken = default)
+        public Task<List<Color>> GetColorListAsyn(string apiKey = default, CancellationToken cancellationToken = default)
+        {
+            return GetColorListAsync(apiKey, cancellationToken);
+        } // !GetColorListAsyn()
+
+
+        public async Task<List<Color>> GetColorListAsync(string apiKey = default, CancellationToken cancellationToken = default)
         {
             var url = new Uri(_baseUri, $"catalog/color_list").ToString();
 
             Dictionary<string, Color> result = await ExecuteGet<Dictionary<string, Color>>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result.Values.ToList();
-        } // !GetColorListAsyn()
+        } // !GetColorListAsync()
 
 
         public async Task<List<ItemInventoryItem>> GetItemInventoryAsync(string boid, string apiKey = default, CancellationToken cancellationToken = default)
@@ -529,7 +487,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "boid", boid);
 
             ItemInventoryItemCollection result = await ExecuteGet<ItemInventoryItemCollection>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Catalog, cancellationToken);
+            await _measureRequest(ResourceType.Catalog, cancellationToken);
             return result?.Items;
         } // !GetItemInventoryAsync()
 
@@ -544,16 +502,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, "order/note").ToString();
 
-            try
-            {
-                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
-                return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
+            return await _ExecutePostReturningSuccess(url, formData, ResourceType.Order, cancellationToken);
         } // !UpdateOrderNoteAsync()
 
 
@@ -561,7 +510,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, "order/tax_schemes").ToString();
             OrderTaxSchemesResponse result = await ExecuteGet<OrderTaxSchemesResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Order, cancellationToken);
+            await _measureRequest(ResourceType.Order, cancellationToken);
             return result;
         } // !GetOrderTaxSchemesAsync()
 
@@ -575,16 +524,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, "order/notify").ToString();
 
-            try
-            {
-                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
-                return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
+            return await _ExecutePostReturningSuccess(url, formData, ResourceType.Order, cancellationToken);
         }  // !SetOrderNotifyAsync()
 
 
@@ -592,7 +532,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, "user/details").ToString();
             UserDetailsResponse result = await ExecuteGet<UserDetailsResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Unknown, cancellationToken);
+            await _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
         } // !GetUserDetailsAsync()
 
@@ -601,7 +541,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, "user/addresses").ToString();
             UserAddressesResponse result = await ExecuteGet<UserAddressesResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Unknown, cancellationToken);
+            await _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
         } // !GetUserAddressesAsync()
 
@@ -610,7 +550,7 @@ namespace BrickOwlSharp.Client
         {
             var url = new Uri(_baseUri, "token/details").ToString();
             TokenDetailsResponse result = await ExecuteGet<TokenDetailsResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Unknown, cancellationToken);
+            await _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
         } // !GetTokenDetailsAsync()
 
@@ -621,7 +561,7 @@ namespace BrickOwlSharp.Client
             url = AppendOptionalParam(url, "invoice_id", invoiceId);
             url = AppendOptionalParam(url, "id_type", idType);
             InvoiceTransactionsResponse result = await ExecuteGet<InvoiceTransactionsResponse>(url, apiKey, cancellationToken);
-            _measureRequest(ResourceType.Unknown, cancellationToken);
+            await _measureRequest(ResourceType.Unknown, cancellationToken);
             return result;
         } // !GetInvoiceTransactionsAsync()
 
@@ -638,23 +578,7 @@ namespace BrickOwlSharp.Client
 
             var url = new Uri(_baseUri, $"order/feedback").ToString();
 
-            try
-            {
-                BrickOwlResult result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken: cancellationToken);
-                _measureRequest(ResourceType.Order, cancellationToken);
-                if (string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
+            return await _ExecutePostReturningSuccess(url, formData, ResourceType.Order, cancellationToken);
         } // !LeaveFeedbackAsync()
 
 
@@ -704,20 +628,9 @@ namespace BrickOwlSharp.Client
 
             message.Content = null;
             AddUserAgent(message);
-            var response = await _httpClient.SendAsync(message, cancellationToken);
 
-            try
-            {
-                response.EnsureSuccessStatusCode();
-            }
-            catch
-            {
-                throw new HttpRequestException($"Received status code {response.StatusCode} for url {url}");
-            }
-
-            var contentAsString = await response.Content.ReadAsStringAsync();
-            var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString) ?? throw new Exception("");
-            return responseData;
+            // url (without key) is used in all messages so the api key never ends up in exceptions
+            return await _SendAndDeserialize<TResponse>(message, $"url {url}", cancellationToken);
         } // !ExecuteGet()
 
 
@@ -726,42 +639,76 @@ namespace BrickOwlSharp.Client
             using var message = new HttpRequestMessage(HttpMethod.Post, url);
             message.Content = new FormUrlEncodedContent(formData);
             AddUserAgent(message);
-            HttpResponseMessage response = null;
+
+            return await _SendAndDeserialize<TResponse>(message, $"url {url} with form data {_FormDataToLogString(formData)}", cancellationToken);
+        } // !ExecutePost()
+
+
+        private async Task<TResponse> _SendAndDeserialize<TResponse>(HttpRequestMessage message, string requestDescription, CancellationToken cancellationToken)
+        {
+            HttpResponseMessage response;
             try
             {
                 response = await _httpClient.SendAsync(message, cancellationToken);
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                throw new HttpRequestException($"Could not execute request for url {url}");
+                throw new HttpRequestException($"Could not execute request for {requestDescription}", ex);
             }
 
-            bool hasErrors = false;
+            using (response)
+            {
+                var contentAsString = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string responseText = String.IsNullOrEmpty(contentAsString) ? "No response." : $"Response: {contentAsString}";
+                    throw new HttpRequestException($"Received status code {response.StatusCode} for {requestDescription}. {responseText}");
+                }
+
+                TResponse responseData;
+                try
+                {
+                    responseData = JsonSerializer.Deserialize<TResponse>(contentAsString);
+                }
+                catch (JsonException ex)
+                {
+                    throw new HttpRequestException($"Invalid response for {requestDescription}. Response: {contentAsString}", ex);
+                }
+
+                if (responseData == null)
+                {
+                    throw new HttpRequestException($"Empty response for {requestDescription}.");
+                }
+
+                return responseData;
+            }
+        } // !_SendAndDeserialize()
+
+
+        private async Task<bool> _ExecutePostReturningSuccess(string url, Dictionary<string, string> formData, ResourceType resourceType, CancellationToken cancellationToken)
+        {
+            BrickOwlResult result;
             try
             {
-                response.EnsureSuccessStatusCode();
+                result = await ExecutePost<BrickOwlResult>(url, formData, cancellationToken);
             }
-            catch
+            catch (HttpRequestException)
             {
-                hasErrors = true;
+                // http and api errors are reported as false, cancellation is passed on to the caller
+                return false;
             }
 
-            var contentAsString = await response.Content.ReadAsStringAsync();
-            var responseData = JsonSerializer.Deserialize<TResponse>(contentAsString) ?? throw new HttpRequestException($"Invalid response for url {url} with form data {JsonSerializer.Serialize(formData)}.");
-            if (hasErrors)
-            {
-                if (!String.IsNullOrEmpty(contentAsString))
-                {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. Response: {contentAsString}");
-                }
-                else
-                {
-                    throw new HttpRequestException($"Received status code {response.StatusCode} for url {url} with form data {JsonSerializer.Serialize(formData)}. No response.");
-                }
-            }
+            await _measureRequest(resourceType, cancellationToken);
+            return string.Equals(result.Status, "success", StringComparison.OrdinalIgnoreCase);
+        } // !_ExecutePostReturningSuccess()
 
-            return responseData;
-        } // !ExecutePost()
+
+        private static string _FormDataToLogString(Dictionary<string, string> formData)
+        {
+            var masked = formData.ToDictionary(kv => kv.Key, kv => kv.Key == "key" ? "***" : kv.Value);
+            return JsonSerializer.Serialize(masked);
+        } // !_FormDataToLogString()
 
 
         private Dictionary<string, string> _ObjectToFormData(object o, bool addKey = true, string apiKey = null)
@@ -827,14 +774,14 @@ namespace BrickOwlSharp.Client
         } // !_ObjectToFormData()
 
 
-        private async void _measureRequest(ResourceType resourceType, CancellationToken cancellationToken = default)
+        private Task _measureRequest(ResourceType resourceType, CancellationToken cancellationToken = default)
         {
             if (this._requestHandler == null)
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            await this._requestHandler.OnRequestAsync(resourceType, cancellationToken);
+            return this._requestHandler.OnRequestAsync(resourceType, cancellationToken);
         } // !_measureRequest()
     }
 }

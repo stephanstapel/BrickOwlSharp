@@ -37,7 +37,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: list wishlists for the authenticated user.
             List<Wishlist> wishlists = await client.GetWishlistsAsync();

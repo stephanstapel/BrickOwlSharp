@@ -35,10 +35,10 @@ internal class ColorDemo
     /// </summary>
     internal async Task RunAsync()
     {
-        IBrickOwlClient client = BrickOwlClientFactory.Build();
+        using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
         // Sample: list all colors.
-        List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsyn();
+        List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsync();
 
         var table = new Table();
         table.AddColumn("Id");

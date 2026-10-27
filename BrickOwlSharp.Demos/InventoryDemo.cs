@@ -43,7 +43,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Toggle write samples to avoid accidental mutations.
             bool runWriteSamples = false;

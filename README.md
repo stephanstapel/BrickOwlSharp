@@ -59,7 +59,7 @@ The demo project is a simple console app that you can use as a reference for wri
 `BrickOwlSharp.Demos/UserDemo.cs` calls the user detail endpoints and prints simple counts so you can validate authentication and see how payloads are returned via `AdditionalData`.
 
 ```C#
-IBrickOwlClient client = BrickOwlClientFactory.Build();
+using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
 // Basic account metadata (shop info, usage limits, etc.).
 UserDetailsResponse userDetails = await client.GetUserDetailsAsync();
@@ -78,7 +78,7 @@ Console.WriteLine($"Token details payload has properties: {tokenDetails.Addition
 `BrickOwlSharp.Demos/InvoiceDemo.cs` shows how to request invoice transactions by public invoice ID. Replace `INV-000000` with your own ID to reconcile a specific invoice.
 
 ```C#
-IBrickOwlClient client = BrickOwlClientFactory.Build();
+using IBrickOwlClient client = BrickOwlClientFactory.Build();
 // "public_invoice_id" tells BrickOwl which lookup field you are using.
 InvoiceTransactionsResponse transactions = await client.GetInvoiceTransactionsAsync("INV-000000", "public_invoice_id");
 Console.WriteLine($"Invoice transactions payload has properties: {transactions.AdditionalData.Count}");
@@ -152,7 +152,7 @@ BulkBatchResponse batchResponse = await client.BulkBatchAsync(batchRequests);
 
 ```C#
 // Useful for building pickers or validating incoming color data.
-List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsyn();
+List<BrickOwlSharp.Client.Color> allColors = await client.GetColorListAsync();
 foreach (BrickOwlSharp.Client.Color color in allColors)
 {
     Console.WriteLine($"{color.Id}: {color.Name} ({color.Hex})");
@@ -164,7 +164,7 @@ By default all calls use the key set on the singleton:
 
 ```C#
 BrickOwlClientConfiguration.Instance.ApiKey = "<YOUR API KEY>";
-IBrickOwlClient client = BrickOwlClientFactory.Build();
+using IBrickOwlClient client = BrickOwlClientFactory.Build();
 ```
 
 If you need to serve **multiple BrickOwl shops** from the same process, pass `apiKey` directly to any method. The per-call key takes precedence over the singleton for that single request; all other calls continue using the singleton key.
@@ -185,8 +185,8 @@ The `apiKey` parameter is available on every method of `IBrickOwlClient` and def
 Alternatively, create a dedicated client instance per shop by passing `apiKey` to `BrickOwlClientFactory.Build()`. This avoids repeating the key on every call:
 
 ```C#
-IBrickOwlClient shopAClient = BrickOwlClientFactory.Build(apiKey: "<SHOP A API KEY>");
-IBrickOwlClient shopBClient = BrickOwlClientFactory.Build(apiKey: "<SHOP B API KEY>");
+using IBrickOwlClient shopAClient = BrickOwlClientFactory.Build(apiKey: "<SHOP A API KEY>");
+using IBrickOwlClient shopBClient = BrickOwlClientFactory.Build(apiKey: "<SHOP B API KEY>");
 
 List<Order> shopAOrders = await shopAClient.GetOrdersAsync();
 List<Order> shopBOrders = await shopBClient.GetOrdersAsync();

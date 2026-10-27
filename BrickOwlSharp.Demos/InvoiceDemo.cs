@@ -36,7 +36,7 @@ namespace BrickOwlSharp.Demos
         /// </summary>
         internal async Task RunAsync()
         {
-            IBrickOwlClient client = BrickOwlClientFactory.Build();
+            using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
             // Sample: retrieve invoice transactions by a public invoice ID.
             InvoiceTransactionsResponse transactions = await client.GetInvoiceTransactionsAsync("INV-000000", "public_invoice_id");

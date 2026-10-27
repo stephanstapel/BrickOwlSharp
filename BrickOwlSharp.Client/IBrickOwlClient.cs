@@ -39,11 +39,11 @@ namespace BrickOwlSharp.Client
     /// <code>
     /// BrickOwlClientConfiguration.Instance.ApiKey = "<your api key>";
     ///
-    /// IBrickOwlClient client = BrickOwlClientFactory.Build();
+    /// using IBrickOwlClient client = BrickOwlClientFactory.Build();
     /// List&lt;Order&gt; allOrders = await client.GetOrdersAsync(orderSortType: OrderSortType.Updated);
     /// </code>
     /// </example>
-    public interface IBrickOwlClient
+    public interface IBrickOwlClient : IDisposable
     {
         /// <summary>
         /// Retrieve a list of orders for the authenticated account.
@@ -254,6 +254,14 @@ namespace BrickOwlSharp.Client
         /// </summary>
         /// <param name="cancellationToken">Token to cancel the request.</param>
         /// <returns>List of colors.</returns>
+        public Task<List<Color>> GetColorListAsync(string apiKey = default, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieve the catalog color list.
+        /// </summary>
+        /// <param name="cancellationToken">Token to cancel the request.</param>
+        /// <returns>List of colors.</returns>
+        [Obsolete("Use GetColorListAsync instead.")]
         public Task<List<Color>> GetColorListAsyn(string apiKey = default, CancellationToken cancellationToken = default);
 
         /// <summary>

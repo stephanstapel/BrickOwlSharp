@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BrickOwlSharp;
@@ -35,7 +36,7 @@ namespace BrickOwlSharp.Client.Json
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var stringValue = reader.GetString();
-            if (Int32.TryParse(stringValue, out int value))
+            if (Int64.TryParse(stringValue, out long value))
             {
                 return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(value).ToLocalTime();
             }
@@ -44,8 +45,8 @@ namespace BrickOwlSharp.Client.Json
 
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            int _value = (int)(value.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-            var typeString = _value.ToString();
+            long _value = (long)(value.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            var typeString = _value.ToString(CultureInfo.InvariantCulture);
             writer.WriteStringValue(typeString);
         }
     }

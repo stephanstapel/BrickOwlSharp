@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BrickOwlSharp;
@@ -40,7 +41,7 @@ namespace BrickOwlSharp.Client.Json
                 return null;
             }
 
-            if (Int32.TryParse(stringValue, out int value))
+            if (Int64.TryParse(stringValue, out long value))
             {
                 return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(value).ToLocalTime();
             }
@@ -60,8 +61,8 @@ namespace BrickOwlSharp.Client.Json
         {
             if (value.HasValue)
             {
-                int _value = (int)(value.Value.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-                var typeString = _value.ToString();
+                long _value = (long)(value.Value.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+                var typeString = _value.ToString(CultureInfo.InvariantCulture);
                 writer.WriteStringValue(typeString);
             }
             else

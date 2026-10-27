@@ -36,7 +36,7 @@ internal class OrderDemo
     /// </summary>
     internal async Task RunAsync()
     {
-        IBrickOwlClient client = BrickOwlClientFactory.Build();
+        using IBrickOwlClient client = BrickOwlClientFactory.Build();
 
         // Toggle feedback samples to avoid accidental feedback submissions.
         bool runFeedbackSample = false;

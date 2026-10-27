@@ -45,7 +45,7 @@ namespace BrickOwlSharp.Client.Json
 
         public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options)
         {
-            var typeString = value.ToString();
+            var typeString = value.ToString(CultureInfo.InvariantCulture);
             writer.WriteStringValue(typeString);
         }
     }
