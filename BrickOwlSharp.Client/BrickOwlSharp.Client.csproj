@@ -17,10 +17,17 @@
     <Description>BrickOwlSharp is a C# library for interacting with the BrickOwl API. It provides a simple and intuitive interface for developers to access the full functionality of the BrickOwl platform, including searching for LEGO parts, sets, and minifigures, managing orders and inventory, and much more.
 
 With BrickOwlSharp, developers can easily integrate BrickOwl into their applications and services, and build powerful tools and workflows that leverage the capabilities of the BrickOwl platform.</Description>
-    <AssemblyVersion>3.2.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
-    <Version>3.2.0</Version>
-    <PackageReleaseNotes>3.0.0
+    <AssemblyVersion>3.3.0.0</AssemblyVersion>
+    <FileVersion>3.3.0.0</FileVersion>
+    <Version>3.3.0</Version>
+    <PackageReleaseNotes>3.3.0: * API key is masked in exception messages
+* IBrickOwlClient implements IDisposable (custom implementations must add Dispose)
+* IBrickOwlRequestHandler is now awaited; handler exceptions reach the caller
+* Better error messages (status code + response body); cancellation is no longer turned into an HTTP error
+* New GetColorListAsync; GetColorListAsyn is obsolete
+* Unix timestamps beyond 2038 supported; decimals serialized with invariant culture
+* System.Text.Json 10.0.14
+3.0.0
 * Enhance README feature descriptions by @stephanstapel in https://github.com/stephanstapel/BrickOwlSharp/pull/12
 * Add per-method apiKey parameter and multi-store support by @norberto5 in https://github.com/stephanstapel/BrickOwlSharp/pull/16
 * Add ShipCollectionPoint property to OrderDetails by @norberto5 in https://github.com/stephanstapel/BrickOwlSharp/pull/15
