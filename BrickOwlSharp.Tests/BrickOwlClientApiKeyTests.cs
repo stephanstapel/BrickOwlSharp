@@ -38,6 +38,7 @@ public class BrickOwlClientApiKeyTests
     {
         public string? CapturedUrl { get; private set; }
         public string? CapturedBody { get; private set; }
+        public string? CapturedUserAgent { get; private set; }
         private readonly string _responseJson;
 
         public CapturingHandler(string responseJson)
@@ -48,6 +49,7 @@ public class BrickOwlClientApiKeyTests
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             CapturedUrl = request.RequestUri?.ToString();
+            CapturedUserAgent = request.Headers.UserAgent.ToString();
             if (request.Content != null)
                 CapturedBody = await request.Content.ReadAsStringAsync();
             return new HttpResponseMessage(HttpStatusCode.OK)
@@ -257,5 +259,49 @@ public class BrickOwlClientApiKeyTests
         await client.UpdateInventoryAsync(new UpdateInventory { UpdateExternalId = "3f9a2b7c-1d4e-4a5b-9c6d-7e8f9a0b1c2d" });
 
         Assert.Contains("update_external_id_1=3f9a2b7c-1d4e-4a5b-9c6d-7e8f9a0b1c2d", handler.CapturedBody);
+    }
+
+    [Fact]
+    public async Task GetOrdersAsync_WithoutUserAgent_SendsDefaultUserAgent()
+    {
+        BrickOwlClientConfiguration.Instance.ApiKey = "test-key";
+        BrickOwlClientConfiguration.Instance.UserAgent = null;
+        var (client, handler) = BuildClient("[]");
+
+        await client.GetOrdersAsync();
+
+        Assert.Equal("BrickOwlSharp/1.0", handler.CapturedUserAgent);
+    }
+
+    [Fact]
+    public async Task GetOrdersAsync_WithCustomUserAgent_SendsCustomUserAgent()
+    {
+        BrickOwlClientConfiguration.Instance.ApiKey = "test-key";
+        BrickOwlClientConfiguration.Instance.UserAgent = "MyShop/2.3";
+        var (client, handler) = BuildClient("[]");
+
+        await client.GetOrdersAsync();
+
+        Assert.Equal("MyShop/2.3", handler.CapturedUserAgent);
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_WithCustomUserAgent_SendsCustomUserAgent()
+    {
+        BrickOwlClientConfiguration.Instance.ApiKey = "test-key";
+        BrickOwlClientConfiguration.Instance.UserAgent = "MyShop/2.3";
+        var (client, handler) = BuildClient("{\"status\":\"success\"}");
+
+        await client.UpdateOrderStatusAsync(1, OrderStatus.Processing);
+
+        Assert.Equal("MyShop/2.3", handler.CapturedUserAgent);
+    }
+
+    [Fact]
+    public void UserAgent_SetToEmpty_FallsBackToDefault()
+    {
+        BrickOwlClientConfiguration.Instance.UserAgent = "";
+
+        Assert.Equal("BrickOwlSharp/1.0", BrickOwlClientConfiguration.Instance.UserAgent);
     }
 }

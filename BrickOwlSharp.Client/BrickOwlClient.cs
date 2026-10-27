@@ -690,6 +690,12 @@ namespace BrickOwlSharp.Client
         } // !AppendOptionalParam()
 
 
+        private static void AddUserAgent(HttpRequestMessage message)
+        {
+            message.Headers.TryAddWithoutValidation("User-Agent", BrickOwlClientConfiguration.Instance.UserAgent);
+        } // !AddUserAgent()
+
+
         private async Task<TResponse> ExecuteGet<TResponse>(string url, string apiKey = null, CancellationToken cancellationToken = default)
         {
             var urlWithKey = AppendApiKey(url, apiKey);
@@ -697,6 +703,7 @@ namespace BrickOwlSharp.Client
             using var message = new HttpRequestMessage(HttpMethod.Get, urlWithKey);
 
             message.Content = null;
+            AddUserAgent(message);
             var response = await _httpClient.SendAsync(message, cancellationToken);
 
             try
@@ -717,13 +724,12 @@ namespace BrickOwlSharp.Client
         private async Task<TResponse> ExecutePost<TResponse>(string url, Dictionary<string, string> formData, CancellationToken cancellationToken = default)
         {
             using var message = new HttpRequestMessage(HttpMethod.Post, url);
-            HttpContent content = new FormUrlEncodedContent(formData);
+            message.Content = new FormUrlEncodedContent(formData);
+            AddUserAgent(message);
             HttpResponseMessage response = null;
             try
             {
-                Task<HttpResponseMessage> responseTask = _httpClient.PostAsync(url, content, cancellationToken);
-                responseTask.Wait();
-                response = responseTask.Result;
+                response = await _httpClient.SendAsync(message, cancellationToken);
             }
             catch
             {

@@ -32,7 +32,21 @@ namespace BrickOwlSharp.Client
 {
     public class BrickOwlClientConfiguration
     {
+        private const string DefaultUserAgent = "BrickOwlSharp/1.0";
+        private string _userAgent;
+
+
         public string ApiKey { get; set; }
+
+
+        /// <summary>
+        /// User-Agent header sent with every request. Falls back to the library default when null or empty.
+        /// </summary>
+        public string UserAgent
+        {
+            get => string.IsNullOrWhiteSpace(_userAgent) ? DefaultUserAgent : _userAgent;
+            set => _userAgent = value;
+        }
 
 
         private static readonly Lazy<BrickOwlClientConfiguration> _lazy =

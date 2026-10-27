@@ -23,6 +23,12 @@ Just like with BricklinkSharp (https://github.com/gebirgslok/BricklinkSharp) and
 BrickOwlClientConfiguration.Instance.ApiKey = "<YOUR API KEY>";
 ```
 
+Every request carries a `User-Agent` header (default `BrickOwlSharp/1.0`). You can override it to identify your application:
+
+```C#
+BrickOwlClientConfiguration.Instance.UserAgent = "MyShop/1.0";
+```
+
 If you'd like to run the demos, add an `apikey.txt` file next to `BrickOwlSharp.Demos/Program.cs` (see the demo section below) and paste your BrickOwl API key into it.
 
 ## New in this update
