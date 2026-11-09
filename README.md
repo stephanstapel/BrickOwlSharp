@@ -339,5 +339,11 @@ BrickOwlClientConfiguration.Instance.ApiCallEvent += new BrickOwlApiCallDelegate
 
 In reality, you might want to increase a counter in a database or a counter in a monitoring system like Prometheus.
 
+## Error handling
+- A non-success status code or an unreadable response throws `HttpRequestException`. The message contains the status code and (up to 500 characters of) an error response body; the body of an unreadable success response is never included, as it may contain buyer data.
+- Exceptions thrown by `HttpClient.SendAsync` or by a `DelegatingHandler` in your pipeline reach the caller unchanged, so `HttpRequestException.StatusCode` set by such a handler is preserved.
+- A cancelled call and an `HttpClient.Timeout` both throw `TaskCanceledException` (`OperationCanceledException`); for a timeout its `InnerException` is a `TimeoutException`. Treat a timed-out write as having an unknown outcome: it may still have been applied by BrickOwl.
+- Methods returning `bool` (e.g. `UpdateOrderStatusAsync`) return `false` on an `HttpRequestException` instead of throwing.
+
 ## Further functionality
 If you should have further use cases you'd like to implement, drop an issue or - even better - drop a pull request.
