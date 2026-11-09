@@ -25,6 +25,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      id-token: write 
     steps:
     - uses: actions/checkout@v7
       with:
@@ -116,10 +117,16 @@ jobs:
     - name: Pack
       run: dotnet pack BrickOwlSharp.Client/BrickOwlSharp.Client.csproj --no-build -c Release -o ./nupkgs
 
+    - name: NuGet login (OIDC)
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: <dein NuGet-Profilname>
+
     - name: Push to NuGet
       uses: ./.github/actions/nuget-push
       with:
-        api-key: ${{ secrets.NUGET_API_KEY }}
+        api-key: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
 
     - name: Create GitHub Release
       env:
