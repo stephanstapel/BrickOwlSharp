@@ -36,7 +36,7 @@ namespace BrickOwlSharp.Client.Json
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var stringValue = reader.GetString();
-            if (Int64.TryParse(stringValue, out long value))
+            if (Int64.TryParse(stringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out long value))
             {
                 return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(value).ToLocalTime();
             }
