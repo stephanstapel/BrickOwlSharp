@@ -646,15 +646,10 @@ namespace BrickOwlSharp.Client
 
         private async Task<TResponse> _SendAndDeserialize<TResponse>(HttpRequestMessage message, string requestDescription, CancellationToken cancellationToken)
         {
-            HttpResponseMessage response;
-            try
-            {
-                response = await _httpClient.SendAsync(message, cancellationToken);
-            }
-            catch (HttpRequestException ex)
-            {
-                throw new HttpRequestException($"Could not execute request for {requestDescription}", ex);
-            }
+            // Exceptions from SendAsync (including ones thrown by a DelegatingHandler in the pipeline) are passed on
+            // unchanged: on .NET 5+ they can carry HttpRequestException.StatusCode, which a wrapping exception built
+            // against netstandard2.0 cannot set, and callers use it to tell e.g. a revoked key (401/403) from an outage.
+            HttpResponseMessage response = await _httpClient.SendAsync(message, cancellationToken);
 
             using (response)
             {
@@ -662,7 +657,7 @@ namespace BrickOwlSharp.Client
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    string responseText = String.IsNullOrEmpty(contentAsString) ? "No response." : $"Response: {contentAsString}";
+                    string responseText = String.IsNullOrEmpty(contentAsString) ? "No response." : $"Response: {TruncateResponseText(contentAsString)}";
                     throw new HttpRequestException($"Received status code {response.StatusCode} for {requestDescription}. {responseText}");
                 }
 
@@ -673,7 +668,8 @@ namespace BrickOwlSharp.Client
                 }
                 catch (JsonException ex)
                 {
-                    throw new HttpRequestException($"Invalid response for {requestDescription}. Response: {contentAsString}", ex);
+                    // The body is left out on purpose: successful responses (e.g. orders) contain buyer names and addresses.
+                    throw new HttpRequestException($"Invalid response for {requestDescription} ({contentAsString.Length} characters).", ex);
                 }
 
                 if (responseData == null)
@@ -684,6 +680,13 @@ namespace BrickOwlSharp.Client
                 return responseData;
             }
         } // !_SendAndDeserialize()
+
+
+        private static string TruncateResponseText(string text)
+        {
+            const int maxLength = 500;
+            return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "... (truncated)";
+        } // !TruncateResponseText()
 
 
         private async Task<bool> _ExecutePostReturningSuccess(string url, Dictionary<string, string> formData, ResourceType resourceType, CancellationToken cancellationToken)

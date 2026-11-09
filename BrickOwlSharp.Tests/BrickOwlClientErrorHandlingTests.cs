@@ -175,4 +175,71 @@ public class BrickOwlClientErrorHandlingTests
 
         Assert.Equal("White", Assert.Single(colors).Name);
     }
+
+    private static IBrickOwlClient BuildThrowingClient(Exception exception)
+    {
+        return BrickOwlClientFactory.Build(new HttpClient(new StubHttpMessageHandler((_, _) => throw exception)));
+    }
+
+    [Fact]
+    public async Task GetOrdersAsync_PipelineThrowsWithStatusCode_StatusCodeReachesCaller()
+    {
+        var original = new HttpRequestException("Unauthorized", null, HttpStatusCode.Unauthorized);
+        using var client = BuildThrowingClient(original);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetOrdersAsync(apiKey: ApiKey));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, ex.StatusCode);
+        Assert.Same(original, ex);
+    }
+
+    [Fact]
+    public async Task UpdateInventoryAsync_PipelineThrowsWithStatusCode_StatusCodeReachesCaller()
+    {
+        using var client = BuildThrowingClient(new HttpRequestException("Forbidden", null, HttpStatusCode.Forbidden));
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.UpdateInventoryAsync(new UpdateInventory { LotId = 1 }, apiKey: ApiKey));
+
+        Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetOrdersAsync_SuccessStatusWithUnreadableBody_DoesNotPutBodyInMessage()
+    {
+        const string body = "[{\"order_id\":\"1\",\"buyer_name\":\"Jane Doe\",\"street\":\"1 Main St\"";
+        using var client = BuildClient(HttpStatusCode.OK, body);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetOrdersAsync(apiKey: ApiKey));
+
+        Assert.IsAssignableFrom<JsonException>(ex.InnerException);
+        Assert.DoesNotContain("Jane Doe", ex.Message);
+        Assert.DoesNotContain("1 Main St", ex.Message);
+    }
+
+    [Fact]
+    public async Task GetOrdersAsync_ErrorStatusWithLongBody_TruncatesBodyInMessage()
+    {
+        string body = new string('x', 500) + "TAIL";
+        using var client = BuildClient(HttpStatusCode.BadGateway, body);
+
+        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetOrdersAsync(apiKey: ApiKey));
+
+        Assert.Contains(new string('x', 500), ex.Message);
+        Assert.DoesNotContain("TAIL", ex.Message);
+    }
+
+    [Fact]
+    public async Task UpdateInventoryAsync_HttpClientTimeout_ThrowsTaskCanceledExceptionWithTimeoutInnerException()
+    {
+        var handler = new StubHttpMessageHandler(async (_, ct) =>
+        {
+            await Task.Delay(Timeout.Infinite, ct);
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+        using var client = BrickOwlClientFactory.Build(new HttpClient(handler) { Timeout = TimeSpan.FromMilliseconds(50) });
+
+        var ex = await Assert.ThrowsAsync<TaskCanceledException>(() => client.UpdateInventoryAsync(new UpdateInventory { LotId = 1 }, apiKey: ApiKey));
+
+        Assert.IsType<TimeoutException>(ex.InnerException);
+    }
 }
