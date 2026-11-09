@@ -24,6 +24,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BrickOwlSharp;
@@ -35,7 +36,7 @@ namespace BrickOwlSharp.Client.Json
         public override OrderStatus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var stringValue = reader.GetString();
-            if (Int32.TryParse(stringValue, out int value))
+            if (Int32.TryParse(stringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
             {
                 return (OrderStatus)value;
             }
@@ -44,7 +45,7 @@ namespace BrickOwlSharp.Client.Json
 
         public override void Write(Utf8JsonWriter writer, OrderStatus value, JsonSerializerOptions options)
         {            
-            var typeString = ((int)value).ToString();
+            var typeString = ((int)value).ToString(CultureInfo.InvariantCulture);
             writer.WriteStringValue(typeString);
         }
     }

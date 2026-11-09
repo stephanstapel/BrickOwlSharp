@@ -608,7 +608,7 @@ namespace BrickOwlSharp.Client
 
             var uriBuilder = new UriBuilder(url);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            query[key] = value.ToString();
+            query[key] = Convert.ToString(value, CultureInfo.InvariantCulture);
             uriBuilder.Query = query.ToString();
             return uriBuilder.ToString();
         } // !AppendOptionalParam()
@@ -749,14 +749,7 @@ namespace BrickOwlSharp.Client
                 }
                 else if (String.IsNullOrEmpty(converterName) && (rawValue != null))
                 {
-                    if (rawValue is decimal v)
-                    {
-                        value = v.ToString(CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        value = rawValue.ToString();
-                    }
+                    value = Convert.ToString(rawValue, CultureInfo.InvariantCulture);
                 }
 
                 if (value != null)

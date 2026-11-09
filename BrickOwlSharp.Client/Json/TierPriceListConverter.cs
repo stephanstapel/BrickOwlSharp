@@ -24,6 +24,7 @@
 # endregion
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
@@ -59,8 +60,8 @@ namespace BrickOwlSharp.Client.Json
                 var price = reader.GetString();
                 tierPrices.Add(new TierPrice
                 {
-                    Quantity = int.Parse(threshold),
-                    Price = decimal.Parse(price)
+                    Quantity = int.Parse(threshold, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                    Price = decimal.Parse(price, NumberStyles.Number, CultureInfo.InvariantCulture)
                 });
 
                 reader.Read();

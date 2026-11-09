@@ -41,13 +41,13 @@ namespace BrickOwlSharp.Client.Json
                 return null;
             }
 
-            if (Int64.TryParse(stringValue, out long value))
+            if (Int64.TryParse(stringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out long value))
             {
                 return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(value).ToLocalTime();
             }
             else
             {
-                if (DateTimeOffset.TryParse(stringValue, out DateTimeOffset dateTimeOffset))
+                if (DateTimeOffset.TryParse(stringValue, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dateTimeOffset))
                 {
                     DateTime dateTime = dateTimeOffset.LocalDateTime;
                     return dateTime.ToLocalTime();
