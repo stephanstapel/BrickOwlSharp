@@ -121,7 +121,7 @@ jobs:
       id: nuget-login
       uses: NuGet/login@v1
       with:
-        user: <dein NuGet-Profilname>
+        user: 12stephan34
 
     - name: Push to NuGet
       uses: ./.github/actions/nuget-push
